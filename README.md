@@ -79,39 +79,70 @@ http://127.0.0.1:3000/api/auth/callback
 ```
 
 
+## 🧭 Navigation & Routes (A2)
+
+### Routes principales
+
+| Route | Description | Accès |
+|-------|-------------|-------|
+| `/` | Page de login Spotify | Public |
+| `/dashboard` | Statistiques d'écoute | Authentifié |
+| `/blind-test` | Quiz musical | Authentifié |
+| `/mood-generator` | Générateur de playlist | Authentifié |
+
+### Architecture
+
+Les pages authentifiées utilisent un **layout commun** avec une sidebar de navigation :
+
+- Le groupe de routes `(app)` contient toutes les pages protégées
+- Le layout `(app)/layout.tsx` vérifie l'authentification et affiche la navigation
+- Si non connecté → redirection automatique vers `/`
+- Si connecté sur `/` → redirection vers `/dashboard`
+
+### Navigation
+
+La sidebar affiche :
+- Logo SpotyFusion
+- Liens vers les 3 fonctionnalités principales
+- État actif sur la route courante
+- Bouton de déconnexion
+
 ## 📁 Structure du Projet
 
 ```
 spotyfusion/
 ├── src/
 │   ├── app/
+│   │   ├── (app)/              # Pages authentifiées (avec layout commun)
+│   │   │   ├── layout.tsx      # Layout avec sidebar + auth guard
+│   │   │   ├── dashboard/
+│   │   │   ├── blind-test/
+│   │   │   └── mood-generator/
 │   │   ├── api/auth/           # Routes API d'authentification
-│   │   │   ├── login/route.ts  # Initie le flux OAuth
-│   │   │   ├── callback/route.ts # Gère le callback Spotify
-│   │   │   ├── session/route.ts  # Retourne l'état de session
-│   │   │   └── logout/route.ts   # Déconnexion
-│   │   ├── dashboard/page.tsx  # Page protégée
+│   │   │   ├── login/route.ts
+│   │   │   ├── callback/route.ts
+│   │   │   ├── session/route.ts
+│   │   │   └── logout/route.ts
 │   │   ├── layout.tsx          # Layout racine
 │   │   ├── page.tsx            # Page d'accueil / Login
-│   │   ├── providers.tsx       # Context providers
-│   │   └── globals.css         # Styles globaux
+│   │   ├── providers.tsx
+│   │   └── globals.css
 │   │
 │   ├── components/
-│   │   └── Common/             # Composants génériques
+│   │   ├── Common/
+│   │   └── Navigation/
+│   │       └── AppNavigation.tsx
 │   │
 │   ├── context/
-│   │   └── AuthContext.tsx     # Contexte d'authentification
+│   │   └── AuthContext.tsx
 │   │
-│   ├── lib/
-│   │   ├── auth/
-│   │   │   └── pkce.ts         # Utilitaires PKCE
-│   │   └── spotify/
-│   │       ├── spotifyClient.ts
-│   │       └── types.ts
-│   │
-│   └── config/
-│       └── env.ts
+│   └── lib/
+│       ├── auth/
+│       │   └── pkce.ts
+│       └── spotify/
+│           ├── spotifyClient.ts
+│           └── types.ts
 │
 ├── .env.example
-├── .env.local                  # (non versionné)
+├── .env.local
 ```
