@@ -6,3 +6,6 @@
 
 // Common components
 export * from './Common';
+
+// Dashboard components (B1)
+export * from './Dashboard';

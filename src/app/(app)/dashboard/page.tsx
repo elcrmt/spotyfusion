@@ -1,30 +1,56 @@
-// Page Dashboard - Statistiques d'écoute Spotify
+'use client';
+
+// Page Dashboard - Statistiques d'écoute Spotify (B1, B3)
+
+import { useState } from 'react';
+import { TopArtists, TopTracks, RecentlyPlayed } from '@/components/Dashboard';
+import type { TopTimeRange } from '@/lib/spotify/spotifyClient';
+
+// Labels pour les périodes
+const timeRangeLabels: Record<TopTimeRange, string> = {
+  short_term: '4 dernières semaines',
+  medium_term: '6 derniers mois',
+  long_term: 'Depuis toujours',
+};
 
 export default function DashboardPage() {
+  const [timeRange, setTimeRange] = useState<TopTimeRange>('medium_term');
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-2">📊 Dashboard</h1>
-      <p className="text-zinc-400 mb-8">Vos statistiques d&apos;écoute Spotify</p>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Placeholder cards */}
-        <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-2">🎵 Top Artistes</h2>
-          <p className="text-zinc-400 text-sm">Vos artistes les plus écoutés</p>
-          <p className="text-zinc-500 text-xs mt-4">À implémenter (A3)</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">📊 Dashboard</h1>
+          <p className="text-zinc-400">Vos statistiques d&apos;écoute Spotify</p>
         </div>
 
-        <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-2">🎶 Top Titres</h2>
-          <p className="text-zinc-400 text-sm">Vos titres préférés</p>
-          <p className="text-zinc-500 text-xs mt-4">À implémenter (A3)</p>
+        {/* Sélecteur de période (B1) */}
+        <div className="flex gap-2">
+          {(Object.keys(timeRangeLabels) as TopTimeRange[]).map((range) => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`px-4 py-2 text-sm rounded-full transition-colors ${
+                timeRange === range
+                  ? 'bg-green-500 text-black font-medium'
+                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+              }`}
+            >
+              {timeRangeLabels[range]}
+            </button>
+          ))}
         </div>
+      </div>
 
-        <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-2">🕐 Récemment écouté</h2>
-          <p className="text-zinc-400 text-sm">Votre historique récent</p>
-          <p className="text-zinc-500 text-xs mt-4">À implémenter (A3)</p>
-        </div>
+      {/* Top 10 Artistes et Top 10 Titres (B1) */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TopArtists timeRange={timeRange} />
+        <TopTracks timeRange={timeRange} />
+      </div>
+
+      {/* Récemment écouté (B3) */}
+      <div className="mt-6">
+        <RecentlyPlayed />
       </div>
     </div>
   );
