@@ -3,12 +3,15 @@
 /**
  * SpotyFusion - Landing / Login Page
  *
- * The public landing page with Spotify login button.
- *
- * TODO: Implement real OAuth flow with PKCE
+ * The public landing page with ONLY a Spotify login button.
+ * Redirects to /dashboard if already authenticated.
  */
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/Common/Button';
+import { Spinner } from '@/components/Common/Spinner';
 
 // ================================
 // Spotify Logo SVG Component
@@ -28,113 +31,49 @@ function SpotifyLogo({ className = '' }: { className?: string }) {
 }
 
 // ================================
-// Features List
-// ================================
-
-const features = [
-  {
-    icon: '📊',
-    title: 'Dashboard Personnel',
-    description: 'Visualisez vos artistes et morceaux préférés',
-  },
-  {
-    icon: '🎵',
-    title: 'Blind Test',
-    description: 'Testez vos connaissances musicales',
-  },
-  {
-    icon: '🎨',
-    title: 'Générateur de Playlist',
-    description: 'Créez des playlists selon votre humeur',
-  },
-];
-
-// ================================
 // Page Component
 // ================================
 
 export default function HomePage() {
-  /**
-   * TODO: Implement Spotify OAuth login
-   *
-   * Steps to implement:
-   * 1. Generate code_verifier and code_challenge (PKCE)
-   * 2. Store code_verifier in sessionStorage
-   * 3. Redirect to Spotify authorization URL with params:
-   *    - client_id
-   *    - response_type=code
-   *    - redirect_uri
-   *    - code_challenge_method=S256
-   *    - code_challenge
-   *    - scope
-   *    - state (CSRF protection)
-   */
-  const handleLogin = () => {
-    // TODO: Implement OAuth flow
-    console.log('TODO: Implement Spotify OAuth login');
-  };
+  const { isAuthenticated, isLoading, login } = useAuth();
+  const router = useRouter();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading spinner while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // Already authenticated, will redirect
+  if (isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 text-center">
-        {/* Logo and Title */}
-        <div className="mb-8">
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <span className="text-5xl">🎧</span>
-            <h1 className="text-5xl font-bold text-white md:text-6xl">
-              Spoty<span className="text-[#1DB954]">Fusion</span>
-            </h1>
-          </div>
-          <p className="mx-auto max-w-md text-lg text-gray-400">
-            Découvrez vos statistiques Spotify, jouez au blind test et créez des
-            playlists personnalisées selon votre humeur.
-          </p>
-        </div>
-
-        {/* Login Button */}
-        <Button
-          variant="spotify"
-          size="lg"
-          onClick={handleLogin}
-          leftIcon={<SpotifyLogo className="h-5 w-5" />}
-          className="mb-12"
-        >
-          Se connecter avec Spotify
-        </Button>
-
-        {/* Features Grid */}
-        <div className="grid max-w-4xl gap-6 md:grid-cols-3">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 text-left transition-colors hover:border-zinc-700"
-            >
-              <span className="mb-3 block text-3xl">{feature.icon}</span>
-              <h3 className="mb-2 text-lg font-semibold text-white">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-gray-400">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-zinc-800 py-6 text-center text-sm text-gray-500">
-        <p>
-          SpotyFusion utilise l&apos;
-          <a
-            href="https://developer.spotify.com/documentation/web-api/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#1DB954] hover:underline"
-          >
-            API Spotify
-          </a>
-          . Non affilié à Spotify AB.
-        </p>
-      </footer>
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      {/* Login Button ONLY */}
+      <Button
+        variant="spotify"
+        size="lg"
+        onClick={login}
+        leftIcon={<SpotifyLogo className="h-5 w-5" />}
+      >
+        Se connecter avec Spotify
+      </Button>
     </div>
   );
 }

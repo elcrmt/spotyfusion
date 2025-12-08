@@ -28,7 +28,7 @@ SpotyFusion est une application web moderne qui se connecte à votre compte Spot
 ### 1. Cloner le repository
 
 ```bash
-git clone https://github.com/votre-username/spotyfusion.git
+git clone https://github.com/elcrmt/spotyfusion.git
 cd spotyfusion
 ```
 
@@ -55,84 +55,63 @@ npm run dev
 
 Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
 
+## 🔐 Spotify Auth Setup (A1)
+
+### Étape 1 : Configurer .env.local
+
+```bash
+# Spotify API Configuration
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID=votre_client_id_ici
+SPOTIFY_CLIENT_SECRET=votre_client_secret_ici
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback
+SPOTIFY_SCOPES=user-read-private user-read-email user-top-read user-read-recently-played playlist-read-private playlist-modify-public playlist-modify-private
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
+```
+
+### Étape 2 : Vérifier la Redirect URI
+
+⚠️ **Important** : La Redirect URI dans Spotify Dashboard doit correspondre **exactement** à `SPOTIFY_REDIRECT_URI` dans votre `.env.local` :
+
+```
+http://127.0.0.1:3000/api/auth/callback
+```
+
+
 ## 📁 Structure du Projet
 
 ```
 spotyfusion/
 ├── src/
-│   ├── app/                    # Next.js App Router
+│   ├── app/
+│   │   ├── api/auth/           # Routes API d'authentification
+│   │   │   ├── login/route.ts  # Initie le flux OAuth
+│   │   │   ├── callback/route.ts # Gère le callback Spotify
+│   │   │   ├── session/route.ts  # Retourne l'état de session
+│   │   │   └── logout/route.ts   # Déconnexion
+│   │   ├── dashboard/page.tsx  # Page protégée
 │   │   ├── layout.tsx          # Layout racine
 │   │   ├── page.tsx            # Page d'accueil / Login
+│   │   ├── providers.tsx       # Context providers
 │   │   └── globals.css         # Styles globaux
 │   │
-│   ├── components/             # Composants React réutilisables
-│   │   └── Common/             # Composants génériques (Button, Card, Spinner)
+│   ├── components/
+│   │   └── Common/             # Composants génériques
 │   │
-│   ├── lib/                    # Bibliothèques et utilitaires
-│   │   └── spotify/            # Client API Spotify (skeleton)
-│   │       ├── spotifyClient.ts # Fonctions d'appel API (à implémenter)
-│   │       └── types.ts        # Types TypeScript Spotify
+│   ├── context/
+│   │   └── AuthContext.tsx     # Contexte d'authentification
 │   │
-│   └── config/                 # Configuration de l'application
-│       └── env.ts              # Variables d'environnement typées
+│   ├── lib/
+│   │   ├── auth/
+│   │   │   └── pkce.ts         # Utilitaires PKCE
+│   │   └── spotify/
+│   │       ├── spotifyClient.ts
+│   │       └── types.ts
+│   │
+│   └── config/
+│       └── env.ts
 │
-├── public/                     # Fichiers statiques
-├── .env.example                # Template des variables d'environnement
-├── .env.local                  # Variables d'environnement (non versionné)
-├── next.config.ts              # Configuration Next.js
-├── eslint.config.mjs           # Configuration ESLint
-├── prettier.config.mjs         # Configuration Prettier
-└── package.json                # Dépendances et scripts
+├── .env.example
+├── .env.local                  # (non versionné)
 ```
-
-## 📜 Scripts Disponibles
-
-| Script | Commande | Description |
-|--------|----------|-------------|
-| `dev` | `npm run dev` | Lance le serveur de développement |
-| `build` | `npm run build` | Build de production |
-| `start` | `npm run start` | Lance le build de production |
-| `lint` | `npm run lint` | Analyse ESLint |
-| `format` | `npm run format` | Formate le code avec Prettier |
-| `type-check` | `npm run type-check` | Vérifie les types TypeScript |
-
-## 📝 User Stories à implémenter
-
-### US1 - Authentification Spotify
-- [ ] Implémenter le flux OAuth PKCE
-- [ ] Créer le contexte d'authentification
-- [ ] Gérer les tokens (access, refresh)
-- [ ] Page de callback `/callback`
-
-### US2 - Dashboard
-- [ ] Page `/dashboard`
-- [ ] Top Artists
-- [ ] Top Tracks
-- [ ] Recently Played
-
-### US3 - Blind Test
-- [ ] Page `/blind-test`
-- [ ] Sélection de playlist
-- [ ] Logique de quiz
-- [ ] Score et résultats
-
-### US4 - Mood Playlist Generator
-- [ ] Page `/mood-generator`
-- [ ] Sliders d'humeur
-- [ ] Recommandations Spotify
-- [ ] Création de playlist
-
-## 🤝 Contribution
-
-1. Créez votre branche (`git checkout -b feature/US1-auth`)
-2. Committez vos changements (`git commit -m 'feat: US1 - ajout OAuth'`)
-3. Poussez la branche (`git push origin feature/US1-auth`)
-4. Ouvrez une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT.
-
----
-
-Fait avec ❤️ par l'équipe SpotyFusion
