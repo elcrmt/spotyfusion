@@ -1,13 +1,4 @@
-/**
- * SpotyFusion - Spotify API Client
- *
- * This module provides a wrapper around the Spotify Web API.
- * All API calls should go through this client.
- *
- * TODO: Implement actual API calls when authentication is ready.
- *
- * @module lib/spotify/spotifyClient
- */
+// Client Spotify pour les appels API
 
 import { spotifyConfig } from '@/config/env';
 import type {
@@ -24,6 +15,37 @@ import type {
   RecommendationsParams,
   SpotifyApiError,
 } from './types';
+
+// ================================
+// Types A3
+// ================================
+
+// Profil utilisateur simplifié (A3)
+export interface SpotifyUserProfile {
+  id: string;
+  displayName: string | null;
+  imageUrl: string | null;
+  product: 'premium' | 'free' | 'open' | null;
+}
+
+// ================================
+// Client Functions A3
+// ================================
+
+// Récupère le profil de l'utilisateur connecté (A3)
+export async function fetchCurrentUserProfile(): Promise<SpotifyUserProfile> {
+  const response = await fetch('/api/spotify/me');
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('FETCH_PROFILE_ERROR');
+  }
+
+  return response.json();
+}
 
 // ================================
 // HTTP Client Base

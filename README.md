@@ -105,7 +105,37 @@ La sidebar affiche :
 - Logo SpotyFusion
 - Liens vers les 3 fonctionnalités principales
 - État actif sur la route courante
+- Profil utilisateur avec photo et type d'abonnement (A3)
 - Bouton de déconnexion
+
+## 👤 Profil Utilisateur (A3)
+
+### Fonctionnement
+
+Le profil Spotify est récupéré via `/api/spotify/me` qui appelle l'API Spotify `GET /v1/me`.
+
+**Données affichées :**
+- Photo de profil (ou initiale si pas de photo)
+- Nom d'utilisateur
+- Type d'abonnement (Premium / Free)
+
+**Gestion des erreurs :**
+- Si le token est expiré (401), l'utilisateur est redirigé vers la page de login
+- Un skeleton loader s'affiche pendant le chargement
+
+### Architecture
+
+```
+AuthContext                    /api/spotify/me
+     │                              │
+     │ isAuthenticated=true         │
+     └──────► fetchUserProfile() ──►│
+                                    │ accessToken
+                                    └──► GET api.spotify.com/v1/me
+                                              │
+                                    ◄─────────┘
+                                    { id, displayName, imageUrl, product }
+```
 
 ## 📁 Structure du Projet
 
@@ -118,13 +148,16 @@ spotyfusion/
 │   │   │   ├── dashboard/
 │   │   │   ├── blind-test/
 │   │   │   └── mood-generator/
-│   │   ├── api/auth/           # Routes API d'authentification
-│   │   │   ├── login/route.ts
-│   │   │   ├── callback/route.ts
-│   │   │   ├── session/route.ts
-│   │   │   └── logout/route.ts
-│   │   ├── layout.tsx          # Layout racine
-│   │   ├── page.tsx            # Page d'accueil / Login
+│   │   ├── api/
+│   │   │   ├── auth/           # Routes auth (A1)
+│   │   │   │   ├── login/route.ts
+│   │   │   │   ├── callback/route.ts
+│   │   │   │   ├── session/route.ts
+│   │   │   │   └── logout/route.ts
+│   │   │   └── spotify/        # Routes API Spotify (A3+)
+│   │   │       └── me/route.ts
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
 │   │   ├── providers.tsx
 │   │   └── globals.css
 │   │
@@ -134,13 +167,13 @@ spotyfusion/
 │   │       └── AppNavigation.tsx
 │   │
 │   ├── context/
-│   │   └── AuthContext.tsx
+│   │   └── AuthContext.tsx     # Auth + User profile (A1 + A3)
 │   │
 │   └── lib/
 │       ├── auth/
 │       │   └── pkce.ts
 │       └── spotify/
-│           ├── spotifyClient.ts
+│           ├── spotifyClient.ts  # fetchCurrentUserProfile (A3)
 │           └── types.ts
 │
 ├── .env.example
