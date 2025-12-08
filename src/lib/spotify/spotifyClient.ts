@@ -29,6 +29,66 @@ export interface SpotifyUserProfile {
 }
 
 // ================================
+// Types B1
+// ================================
+
+// Top artiste simplifié (B1)
+export interface TopArtist {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  genres: string[];
+  popularity: number;
+  externalUrl: string;
+}
+
+export interface TopArtistsResponse {
+  items: TopArtist[];
+  total: number;
+}
+
+// Top track simplifié (B1)
+export interface TopTrack {
+  id: string;
+  name: string;
+  albumName: string;
+  albumImageUrl: string | null;
+  artists: Array<{ id: string; name: string }>;
+  duration_ms: number;
+  popularity: number;
+  previewUrl: string | null;
+  externalUrl: string;
+}
+
+export interface TopTracksResponse {
+  items: TopTrack[];
+  total: number;
+}
+
+// Type pour la période de temps
+export type TopTimeRange = 'short_term' | 'medium_term' | 'long_term';
+
+// ================================
+// Types B3
+// ================================
+
+// Titre récemment écouté (B3)
+export interface RecentTrack {
+  id: string;
+  name: string;
+  albumName: string;
+  albumImageUrl: string | null;
+  artists: Array<{ id: string; name: string }>;
+  playedAt: string; // ISO 8601 timestamp
+  duration_ms: number;
+  externalUrl: string;
+}
+
+export interface RecentlyPlayedResponse {
+  items: RecentTrack[];
+}
+
+// ================================
 // Client Functions A3
 // ================================
 
@@ -42,6 +102,81 @@ export async function fetchCurrentUserProfile(): Promise<SpotifyUserProfile> {
 
   if (!response.ok) {
     throw new Error('FETCH_PROFILE_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions B1
+// ================================
+
+// Récupère les top artistes de l'utilisateur (B1)
+export async function fetchTopArtists(
+  timeRange: TopTimeRange = 'medium_term',
+  limit: number = 10
+): Promise<TopArtistsResponse> {
+  const params = new URLSearchParams({
+    time_range: timeRange,
+    limit: limit.toString(),
+  });
+
+  const response = await fetch(`/api/spotify/me/top/artists?${params}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('FETCH_TOP_ARTISTS_ERROR');
+  }
+
+  return response.json();
+}
+
+// Récupère les top tracks de l'utilisateur (B1)
+export async function fetchTopTracks(
+  timeRange: TopTimeRange = 'medium_term',
+  limit: number = 10
+): Promise<TopTracksResponse> {
+  const params = new URLSearchParams({
+    time_range: timeRange,
+    limit: limit.toString(),
+  });
+
+  const response = await fetch(`/api/spotify/me/top/tracks?${params}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('FETCH_TOP_TRACKS_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions B3
+// ================================
+
+// Récupère les titres récemment écoutés (B3)
+export async function fetchRecentlyPlayed(
+  limit: number = 5
+): Promise<RecentlyPlayedResponse> {
+  const params = new URLSearchParams({
+    limit: limit.toString(),
+  });
+
+  const response = await fetch(`/api/spotify/me/player/recently-played?${params}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('FETCH_RECENTLY_PLAYED_ERROR');
   }
 
   return response.json();
