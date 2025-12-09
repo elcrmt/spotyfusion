@@ -89,6 +89,34 @@ export interface RecentlyPlayedResponse {
 }
 
 // ================================
+// Types D2
+// ================================
+
+// Résultats de recherche (D2)
+export interface SearchArtist {
+  id: string;
+  name: string;
+  type: 'artist';
+  imageUrl: string | null;
+}
+
+export interface SearchTrack {
+  id: string;
+  name: string;
+  type: 'track';
+  artists: string[];
+  imageUrl: string | null;
+}
+
+export interface SearchResult {
+  artists: SearchArtist[];
+  tracks: SearchTrack[];
+}
+
+// Semence pour les recommandations (D2)
+export type Seed = SearchArtist | SearchTrack | { id: string; name: string; type: 'genre'; imageUrl: null };
+
+// ================================
 // Client Functions A3
 // ================================
 
@@ -177,6 +205,39 @@ export async function fetchRecentlyPlayed(
 
   if (!response.ok) {
     throw new Error('FETCH_RECENTLY_PLAYED_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions D2
+// ================================
+
+// Recherche artistes et tracks (D2)
+export async function searchSpotify(
+  query: string,
+  types: string = 'artist,track',
+  limit: number = 5
+): Promise<SearchResult> {
+  if (!query || query.trim().length === 0) {
+    return { artists: [], tracks: [] };
+  }
+
+  const params = new URLSearchParams({
+    q: query,
+    type: types,
+    limit: limit.toString(),
+  });
+
+  const response = await fetch(`/api/spotify/search?${params}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('SEARCH_ERROR');
   }
 
   return response.json();
