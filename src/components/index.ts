@@ -9,3 +9,6 @@ export * from './Common';
 
 // Dashboard components (B1)
 export * from './Dashboard';
+
+// MoodGenerator components (D1)
+export * from './MoodGenerator';
