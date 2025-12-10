@@ -1,0 +1,142 @@
+/**
+ * SpotyFusion - Global Styles
+ *
+ * Tailwind CSS configuration and custom global styles
+ */
+
+@import 'tailwindcss';
+
+/* ================================
+   CSS Custom Properties (Theme)
+   ================================ */
+:root {
+  /* Colors - Dark theme by default (Spotify-like) */
+  --background: #09090b; /* zinc-950 */
+  --foreground: #fafafa; /* zinc-50 */
+  --muted: #27272a; /* zinc-800 */
+  --muted-foreground: #a1a1aa; /* zinc-400 */
+  --border: #27272a; /* zinc-800 */
+  --ring: #1db954; /* Spotify green */
+
+  /* Spotify brand colors */
+  --spotify-green: #1db954;
+  --spotify-green-hover: #1ed760;
+  --spotify-black: #191414;
+}
+
+/* ================================
+   Tailwind Theme Integration
+   ================================ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ================================
+   Base Styles
+   ================================ */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* ================================
+   Custom Scrollbar (Webkit)
+   ================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b; /* zinc-900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46; /* zinc-700 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b; /* zinc-600 */
+}
+
+/* ================================
+   Custom Range Slider Styles
+   ================================ */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  background: #3f3f46; /* zinc-700 */
+  height: 8px;
+  border-radius: 4px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -4px;
+  background-color: var(--spotify-green);
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  transition: transform 0.1s;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  background-color: var(--spotify-green-hover);
+}
+
+input[type='range']::-moz-range-track {
+  background: #3f3f46;
+  height: 8px;
+  border-radius: 4px;
+}
+
+input[type='range']::-moz-range-thumb {
+  background-color: var(--spotify-green);
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  border: none;
+}
+
+/* ================================
+   Focus States
+   ================================ */
+*:focus-visible {
+  outline: 2px solid var(--spotify-green);
+  outline-offset: 2px;
+}
+
+/* ================================
+   Selection
+   ================================ */
+::selection {
+  background-color: var(--spotify-green);
+  color: #000;
+}
+
+/* ================================
+   Screen Reader Only (Utility)
+   ================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

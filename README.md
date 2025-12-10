@@ -1,0 +1,181 @@
+# 🎧 SpotyFusion
+
+> Votre compagnon Spotify - Statistiques, Blind Test et Générateur de Playlists
+
+SpotyFusion est une application web moderne qui se connecte à votre compte Spotify pour vous offrir :
+- 📊 Un **Dashboard** avec vos statistiques d'écoute personnelles
+- 🎵 Un **Blind Test** musical basé sur vos playlists
+- 🎨 Un **Générateur de Playlist** selon votre humeur
+
+## 🛠️ Stack Technique
+
+| Technologie | Version | Description |
+|-------------|---------|-------------|
+| [Next.js](https://nextjs.org/) | 16.x | Framework React avec App Router |
+| [React](https://react.dev/) | 19.x | Bibliothèque UI |
+| [TypeScript](https://www.typescriptlang.org/) | 5.x | Typage statique |
+| [Tailwind CSS](https://tailwindcss.com/) | 4.x | Styling utilitaire |
+| [Spotify Web API](https://developer.spotify.com/documentation/web-api/) | - | API Spotify |
+
+## 📋 Prérequis
+
+- **Node.js** : v18.x ou supérieur (recommandé : v20.x)
+- **npm** : v9.x ou supérieur
+- **Compte Spotify Developer** : Pour obtenir les credentials de l'API
+
+## 🚀 Installation
+
+### 1. Cloner le repository
+
+```bash
+git clone https://github.com/elcrmt/spotyfusion.git
+cd spotyfusion
+```
+
+### 2. Installer les dépendances
+
+```bash
+npm install
+```
+
+### 3. Configurer les variables d'environnement
+
+```bash
+# Copier le fichier d'exemple
+cp .env.example .env.local
+
+# Éditer .env.local avec vos credentials Spotify
+```
+
+### 4. Lancer le serveur de développement
+
+```bash
+npm run dev
+```
+
+Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
+
+## 🔐 Spotify Auth Setup (A1)
+
+### Étape 1 : Configurer .env.local
+
+```bash
+# Spotify API Configuration
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID=votre_client_id_ici
+SPOTIFY_CLIENT_SECRET=votre_client_secret_ici
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:3000/api/auth/callback
+SPOTIFY_SCOPES=user-read-private user-read-email user-top-read user-read-recently-played playlist-read-private playlist-modify-public playlist-modify-private
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
+```
+
+### Étape 2 : Vérifier la Redirect URI
+
+⚠️ **Important** : La Redirect URI dans Spotify Dashboard doit correspondre **exactement** à `SPOTIFY_REDIRECT_URI` dans votre `.env.local` :
+
+```
+http://127.0.0.1:3000/api/auth/callback
+```
+
+
+## 🧭 Navigation & Routes (A2)
+
+### Routes principales
+
+| Route | Description | Accès |
+|-------|-------------|-------|
+| `/` | Page de login Spotify | Public |
+| `/dashboard` | Statistiques d'écoute | Authentifié |
+| `/blind-test` | Quiz musical | Authentifié |
+| `/mood-generator` | Générateur de playlist | Authentifié |
+
+### Architecture
+
+Les pages authentifiées utilisent un **layout commun** avec une sidebar de navigation :
+
+- Le groupe de routes `(app)` contient toutes les pages protégées
+- Le layout `(app)/layout.tsx` vérifie l'authentification et affiche la navigation
+- Si non connecté → redirection automatique vers `/`
+- Si connecté sur `/` → redirection vers `/dashboard`
+
+### Navigation
+
+La sidebar affiche :
+- Logo SpotyFusion
+- Liens vers les 3 fonctionnalités principales
+- État actif sur la route courante
+- Profil utilisateur avec photo et type d'abonnement (A3)
+- Bouton de déconnexion
+
+## 👤 Profil Utilisateur (A3)
+
+### Fonctionnement
+
+Le profil Spotify est récupéré via `/api/spotify/me` qui appelle l'API Spotify `GET /v1/me`.
+
+**Données affichées :**
+- Photo de profil (ou initiale si pas de photo)
+- Nom d'utilisateur
+- Type d'abonnement (Premium / Free)
+
+**Gestion des erreurs :**
+- Si le token est expiré (401), l'utilisateur est redirigé vers la page de login
+- Un skeleton loader s'affiche pendant le chargement
+
+### Architecture
+
+```
+AuthContext                    /api/spotify/me
+     │                              │
+     │ isAuthenticated=true         │
+     └──────► fetchUserProfile() ──►│
+                                    │ accessToken
+                                    └──► GET api.spotify.com/v1/me
+                                              │
+                                    ◄─────────┘
+                                    { id, displayName, imageUrl, product }
+```
+
+## 📁 Structure du Projet
+
+```
+spotyfusion/
+├── src/
+│   ├── app/
+│   │   ├── (app)/              # Pages authentifiées (avec layout commun)
+│   │   │   ├── layout.tsx      # Layout avec sidebar + auth guard
+│   │   │   ├── dashboard/
+│   │   │   ├── blind-test/
+│   │   │   └── mood-generator/
+│   │   ├── api/
+│   │   │   ├── auth/           # Routes auth (A1)
+│   │   │   │   ├── login/route.ts
+│   │   │   │   ├── callback/route.ts
+│   │   │   │   ├── session/route.ts
+│   │   │   │   └── logout/route.ts
+│   │   │   └── spotify/        # Routes API Spotify (A3+)
+│   │   │       └── me/route.ts
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── providers.tsx
+│   │   └── globals.css
+│   │
+│   ├── components/
+│   │   ├── Common/
+│   │   └── Navigation/
+│   │       └── AppNavigation.tsx
+│   │
+│   ├── context/
+│   │   └── AuthContext.tsx     # Auth + User profile (A1 + A3)
+│   │
+│   └── lib/
+│       ├── auth/
+│       │   └── pkce.ts
+│       └── spotify/
+│           ├── spotifyClient.ts  # fetchCurrentUserProfile (A3)
+│           └── types.ts
+│
+├── .env.example
+├── .env.local
+```
