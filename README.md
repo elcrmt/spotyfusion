@@ -137,6 +137,34 @@ AuthContext                    /api/spotify/me
                                     { id, displayName, imageUrl, product }
 ```
 
+## 🎮 Blind Test - Game Setup (C1)
+
+### Fonctionnement
+
+La page `/blind-test` permet à l'utilisateur de choisir une playlist comme source pour le jeu.
+
+**Flow :**
+1. Chargement des playlists via `/api/spotify/playlists`
+2. Affichage en grille responsive avec images
+3. Sélection d'une playlist (visuellement marquée)
+4. Bouton "Démarrer" activé uniquement si une playlist est choisie
+5. Au clic : `gameStatus` passe à `READY`
+
+**État du jeu (BlindTestContext) :**
+- `selectedPlaylist` : Playlist choisie
+- `gameStatus` : `'SETUP' | 'READY' | 'PLAYING' | 'FINISHED'`
+- `startGame()` : Lance le jeu (TODO: C2-C5)
+
+**API utilisée :**
+- `GET /api/spotify/playlists` → `GET /v1/me/playlists` (limite 50)
+
+### À implémenter
+
+- **C2** : Générer questions depuis la playlist
+- **C3** : Lecteur audio (extraits 30s)
+- **C4** : Système de réponses
+- **C5** : Score et résultats
+
 ## 📁 Structure du Projet
 
 ```
@@ -155,7 +183,8 @@ spotyfusion/
 │   │   │   │   ├── session/route.ts
 │   │   │   │   └── logout/route.ts
 │   │   │   └── spotify/        # Routes API Spotify (A3+)
-│   │   │       └── me/route.ts
+│   │   │       ├── me/route.ts
+│   │   │       └── playlists/route.ts  # C1
 │   │   ├── layout.tsx
 │   │   ├── page.tsx
 │   │   ├── providers.tsx
@@ -167,13 +196,14 @@ spotyfusion/
 │   │       └── AppNavigation.tsx
 │   │
 │   ├── context/
-│   │   └── AuthContext.tsx     # Auth + User profile (A1 + A3)
+│   │   ├── AuthContext.tsx       # Auth + User profile (A1 + A3)
+│   │   └── BlindTestContext.tsx  # État du jeu (C1)
 │   │
 │   └── lib/
 │       ├── auth/
 │       │   └── pkce.ts
 │       └── spotify/
-│           ├── spotifyClient.ts  # fetchCurrentUserProfile (A3)
+│           ├── spotifyClient.ts  # API client (A3 + C1)
 │           └── types.ts
 │
 ├── .env.example

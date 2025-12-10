@@ -89,6 +89,19 @@ export interface RecentlyPlayedResponse {
 }
 
 // ================================
+// Types C1 - Blind Test
+// ================================
+
+// Playlist utilisateur simplifiée (C1)
+export interface SpotifyUserPlaylist {
+  id: string;
+  name: string;
+  images: Array<{ url: string }> | null;
+  tracksCount: number;
+  ownerName: string;
+}
+
+// ================================
 // Client Functions A3
 // ================================
 
@@ -177,6 +190,25 @@ export async function fetchRecentlyPlayed(
 
   if (!response.ok) {
     throw new Error('FETCH_RECENTLY_PLAYED_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions C1 - Blind Test
+// ================================
+
+// Récupère les playlists de l'utilisateur (C1)
+export async function fetchUserPlaylists(): Promise<SpotifyUserPlaylist[]> {
+  const response = await fetch('/api/spotify/playlists');
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('FETCH_PLAYLISTS_ERROR');
   }
 
   return response.json();

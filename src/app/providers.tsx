@@ -1,14 +1,10 @@
 'use client';
 
-/**
- * SpotyFusion - Global Providers
- *
- * This component wraps the entire app with all necessary context providers.
- * Add new providers here as needed (e.g., theme, i18n, etc.)
- */
+// Providers globaux pour toute l'application
 
 import { ReactNode } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
+import { BlindTestProvider } from '@/context/BlindTestContext';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -17,13 +13,7 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <AuthProvider>
-      {/* 
-        TODO: Add more providers as needed:
-        - ThemeProvider
-        - ToastProvider
-        - etc.
-      */}
-      {children}
+      <BlindTestProvider>{children}</BlindTestProvider>
     </AuthProvider>
   );
 }
