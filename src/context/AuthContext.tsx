@@ -63,12 +63,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(profile);
     } catch (error) {
       console.error('[A3] Erreur profil:', error);
-      // Si 401 = session invalide, on déconnecte
+      // Si 401 = session invalide, on appelle logout pour supprimer le cookie
       if (error instanceof Error && error.message === 'UNAUTHENTICATED') {
         setIsAuthenticated(false);
         setUser(null);
-        // TODO: améliorer le refresh / logout dans A4
-        window.location.href = '/';
+        // Appelle /api/auth/logout pour supprimer le cookie session
+        window.location.href = '/api/auth/logout';
       }
     } finally {
       setIsLoadingUser(false);

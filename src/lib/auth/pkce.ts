@@ -29,11 +29,13 @@ function base64UrlEncode(buffer: Uint8Array): string {
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+import { spotifyConfig } from '@/config/env';
+
 // Construit l'URL d'autorisation Spotify
 export function buildAuthorizeUrl(codeChallenge: string, state: string): string {
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
-  const scopes = process.env.SPOTIFY_SCOPES || '';
+  const scopes = spotifyConfig.scopes.join(' ');
 
   if (!clientId) throw new Error('NEXT_PUBLIC_SPOTIFY_CLIENT_ID manquant');
   if (!redirectUri) throw new Error('SPOTIFY_REDIRECT_URI manquant');
