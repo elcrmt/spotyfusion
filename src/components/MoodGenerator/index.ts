@@ -1,5 +1,6 @@
-// MoodGenerator Components (D1, D2)
+// MoodGenerator Components (D1, D2, D3)
 
 export { AudioFeaturesForm } from './AudioFeaturesForm';
 export type { AudioFeatures } from './AudioFeaturesForm';
 export { SeedSelector } from './SeedSelector';
+export { RecommendationsList } from './RecommendationsList';
