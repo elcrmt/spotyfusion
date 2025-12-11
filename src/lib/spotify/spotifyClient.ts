@@ -89,6 +89,76 @@ export interface RecentlyPlayedResponse {
 }
 
 // ================================
+// Types D2
+// ================================
+
+// Résultats de recherche (D2)
+export interface SearchArtist {
+  id: string;
+  name: string;
+  type: 'artist';
+  imageUrl: string | null;
+}
+
+export interface SearchTrack {
+  id: string;
+  name: string;
+  type: 'track';
+  artists: string[];
+  imageUrl: string | null;
+}
+
+export interface SearchResult {
+  artists: SearchArtist[];
+  tracks: SearchTrack[];
+}
+
+// Semence pour les recommandations (D2)
+export type Seed = SearchArtist | SearchTrack | { id: string; name: string; type: 'genre'; imageUrl: null };
+
+// ================================
+// Types D3
+// ================================
+
+// Track recommandé (D3)
+export interface RecommendedTrack {
+  id: string;
+  name: string;
+  artists: Array<{ id: string; name: string }>;
+  albumName: string;
+  albumImageUrl: string | null;
+  duration_ms: number;
+  previewUrl: string | null;
+  externalUrl: string;
+  energy?: number; // Score d'énergie (0.0 à 1.0)
+}
+
+export interface RecommendationsResponse {
+  tracks: RecommendedTrack[];
+  seeds: Array<{
+    id: string;
+    type: 'artist' | 'track' | 'genre';
+  }>;
+}
+
+// Paramètres pour les recommandations (D3)
+export interface FetchRecommendationsParams {
+  seedArtists?: string[];
+  seedTracks?: string[];
+  seedGenres?: string[];
+  targetDanceability?: number;
+  targetEnergy?: number;
+  targetValence?: number;
+  limit?: number;
+}
+
+// Erreur API avec message (D3)
+export interface ApiError {
+  error: string;
+  message?: string;
+}
+
+// ================================
 // Client Functions A3
 // ================================
 
@@ -177,6 +247,105 @@ export async function fetchRecentlyPlayed(
 
   if (!response.ok) {
     throw new Error('FETCH_RECENTLY_PLAYED_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions D2
+// ================================
+
+// Recherche artistes et tracks (D2)
+export async function searchSpotify(
+  query: string,
+  types: string = 'artist,track',
+  limit: number = 5
+): Promise<SearchResult> {
+  if (!query || query.trim().length === 0) {
+    return { artists: [], tracks: [] };
+  }
+
+  const params = new URLSearchParams({
+    q: query,
+    type: types,
+    limit: limit.toString(),
+  });
+
+  const response = await fetch(`/api/spotify/search?${params}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  if (!response.ok) {
+    throw new Error('SEARCH_ERROR');
+  }
+
+  return response.json();
+}
+
+// ================================
+// Client Functions D3
+// ================================
+
+// Récupère les recommandations Spotify (D3)
+export async function fetchRecommendations(
+  params: FetchRecommendationsParams
+): Promise<RecommendationsResponse> {
+  const searchParams = new URLSearchParams();
+
+  // Ajoute les seeds
+  if (params.seedArtists?.length) {
+    searchParams.append('seed_artists', params.seedArtists.join(','));
+  }
+  if (params.seedTracks?.length) {
+    searchParams.append('seed_tracks', params.seedTracks.join(','));
+  }
+  if (params.seedGenres?.length) {
+    searchParams.append('seed_genres', params.seedGenres.join(','));
+  }
+
+  // Ajoute les caractéristiques audio
+  if (params.targetDanceability !== undefined) {
+    searchParams.append('target_danceability', params.targetDanceability.toString());
+  }
+  if (params.targetEnergy !== undefined) {
+    searchParams.append('target_energy', params.targetEnergy.toString());
+  }
+  if (params.targetValence !== undefined) {
+    searchParams.append('target_valence', params.targetValence.toString());
+  }
+
+  // Limite (par défaut 30, entre 20 et 50)
+  const limit = Math.min(50, Math.max(20, params.limit || 30));
+  searchParams.append('limit', limit.toString());
+
+  const response = await fetch(`/api/spotify/recommendations?${searchParams}`);
+
+  if (response.status === 401) {
+    throw new Error('UNAUTHENTICATED');
+  }
+
+  // Gestion des erreurs 400 (paramètres invalides)
+  if (response.status === 400) {
+    const errorData: ApiError = await response.json();
+    const error = new Error(errorData.message || 'Paramètres invalides');
+    (error as Error & { code: string }).code = 'INVALID_PARAMS';
+    throw error;
+  }
+
+  // Gestion des erreurs 403 (API restreinte par Spotify)
+  if (response.status === 403) {
+    const errorData: ApiError = await response.json();
+    const error = new Error(errorData.message || 'API Recommendations non accessible');
+    (error as Error & { code: string }).code = 'API_RESTRICTED';
+    throw error;
+  }
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json().catch(() => ({ error: 'UNKNOWN' }));
+    throw new Error(errorData.message || 'Erreur lors de la génération des recommandations');
   }
 
   return response.json();
