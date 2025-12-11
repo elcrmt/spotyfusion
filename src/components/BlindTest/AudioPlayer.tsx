@@ -5,76 +5,48 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface AudioPlayerProps {
-    previewUrl: string;
-    onTimeUp?: () => void;
     isPlaying: boolean;
 }
 
 const AUDIO_DURATION = 30; // secondes
 
-export function AudioPlayer({ previewUrl, onTimeUp, isPlaying }: AudioPlayerProps) {
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [isLoaded, setIsLoaded] = useState(false);
+export function AudioPlayer({ isPlaying }: AudioPlayerProps) {
+    const [progress, setProgress] = useState(0);
+    const [remainingTime, setRemainingTime] = useState(AUDIO_DURATION);
 
-    // Gère la lecture/pause
     useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+        let interval: NodeJS.Timeout;
+        let startTime: number;
 
-        if (isPlaying && isLoaded) {
-            audio.play().catch(console.error);
+        if (isPlaying) {
+            startTime = Date.now();
+            // Reset si on redémarre
+            setProgress(0);
+            setRemainingTime(AUDIO_DURATION);
+
+            interval = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+
+                if (elapsed >= AUDIO_DURATION) {
+                    setProgress(100);
+                    setRemainingTime(0);
+                    clearInterval(interval);
+                } else {
+                    setProgress((elapsed / AUDIO_DURATION) * 100);
+                    setRemainingTime(Math.ceil(AUDIO_DURATION - elapsed));
+                }
+            }, 100);
         } else {
-            audio.pause();
+            // Reset quand ça s'arrête
+            setProgress(0);
+            setRemainingTime(AUDIO_DURATION);
         }
-    }, [isPlaying, isLoaded]);
 
-    // Reset quand l'URL change
-    useEffect(() => {
-        setCurrentTime(0);
-        setIsLoaded(false);
-        const audio = audioRef.current;
-        if (audio) {
-            audio.currentTime = 0;
-        }
-    }, [previewUrl]);
-
-    // Met à jour le timer
-    useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
-
-        const handleTimeUpdate = () => {
-            setCurrentTime(audio.currentTime);
-
-            // Limite à 30 secondes
-            if (audio.currentTime >= AUDIO_DURATION) {
-                audio.pause();
-                onTimeUp?.();
-            }
-        };
-
-        const handleLoadedData = () => {
-            setIsLoaded(true);
-        };
-
-        audio.addEventListener('timeupdate', handleTimeUpdate);
-        audio.addEventListener('loadeddata', handleLoadedData);
-
-        return () => {
-            audio.removeEventListener('timeupdate', handleTimeUpdate);
-            audio.removeEventListener('loadeddata', handleLoadedData);
-        };
-    }, [onTimeUp]);
-
-    const progress = Math.min((currentTime / AUDIO_DURATION) * 100, 100);
-    const remainingTime = Math.max(AUDIO_DURATION - Math.floor(currentTime), 0);
+        return () => clearInterval(interval);
+    }, [isPlaying]);
 
     return (
         <div className="w-full">
-            {/* Audio caché */}
-            <audio ref={audioRef} src={previewUrl} preload="auto" />
-
             {/* Visualisation */}
             <div className="flex flex-col items-center gap-4">
                 {/* Cercle animé */}
@@ -130,7 +102,7 @@ export function AudioPlayer({ previewUrl, onTimeUp, isPlaying }: AudioPlayerProp
                 )}
 
                 <p className="text-zinc-400 text-sm">
-                    {isLoaded ? "🎧 Écoutez l'extrait et devinez le titre !" : "Chargement..."}
+                    {isPlaying ? "🎧 Écoutez l'extrait !" : "Prêt ?"}
                 </p>
             </div>
         </div>

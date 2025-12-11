@@ -1,18 +1,18 @@
 'use client';
 
 // Écran de jeu principal (C2-C4)
+// Version SDK Spotify (dumb component)
 
 import { useState } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { AnswerButtons } from './AnswerButtons';
-import { BlindTestQuestion, GameMode } from '@/hooks/useBlindTest';
+import { BlindTestQuestion } from '@/hooks/useBlindTest';
 
 interface GameScreenProps {
     question: BlindTestQuestion;
     questionNumber: number;
     totalQuestions: number;
     score: number;
-    mode: GameMode;
     onAnswer: (index: number) => void;
     onNext: () => void;
     isAnswered: boolean;
@@ -24,7 +24,6 @@ export function GameScreen({
     questionNumber,
     totalQuestions,
     score,
-    mode,
     onAnswer,
     onNext,
     isAnswered,
@@ -59,14 +58,6 @@ export function GameScreen({
                 </div>
             </div>
 
-            {/* Badge du mode de jeu */}
-            <div className={`px-3 py-1 rounded-full text-xs font-medium ${mode === 'audio'
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-purple-500/20 text-purple-400'
-                }`}>
-                {mode === 'audio' ? '🎧 Mode Audio' : '🎤 Quiz Artiste'}
-            </div>
-
             {/* Barre de progression */}
             <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
                 <div
@@ -85,26 +76,13 @@ export function GameScreen({
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                        <span className="text-6xl">{mode === 'audio' ? '🎵' : '🎤'}</span>
+                        <span className="text-6xl">🎵</span>
                     </div>
                 )}
             </div>
 
-            {/* Mode Audio: Audio player */}
-            {mode === 'audio' && question.track.previewUrl && (
-                <AudioPlayer
-                    previewUrl={question.track.previewUrl}
-                    isPlaying={!isAnswered}
-                />
-            )}
-
-            {/* Mode Artist: Affiche le nom de la chanson */}
-            {mode === 'artist' && (
-                <div className="text-center py-4">
-                    <p className="text-zinc-400 text-sm mb-2">Qui chante cette chanson ?</p>
-                    <p className="text-2xl font-bold text-white">"{question.track.name}"</p>
-                </div>
-            )}
+            {/* Audio player (Visual only) */}
+            <AudioPlayer isPlaying={!isAnswered} />
 
             {/* Boutons de réponse */}
             <AnswerButtons
@@ -137,7 +115,14 @@ export function GameScreen({
                     </button>
                 </div>
             )}
+
+            {/* Bouton de secours audio */}
+            <button
+                onClick={() => window.Spotify?.Player?.getInstance()?.resume()}
+                className="mt-4 text-xs text-zinc-500 hover:text-white underline"
+            >
+                Pas de son ? Cliquez ici pour activer le lecteur
+            </button>
         </div>
     );
 }
-

@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+
 // Type simplifié pour un track de playlist
 export interface PlaylistTrackItem {
     id: string;
@@ -43,9 +44,9 @@ export async function GET(
     }
 
     try {
-        // Récupère les tracks de la playlist (limite 100)
+        // Récupère les tracks de la playlist (limite 50 pour ne pas surcharger le finder)
         const response = await fetch(
-            `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&fields=items(track(id,name,artists(name),album(name,images),preview_url)),total`,
+            `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&fields=items(track(id,name,artists(name),album(name,images),preview_url)),total`,
             {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -68,8 +69,8 @@ export async function GET(
 
         const data = await response.json();
 
-        // Transforme TOUS les tracks (pas de filtre sur preview_url)
-        const tracks: PlaylistTrackItem[] = data.items
+        // Transforme API tracks
+        let tracks: PlaylistTrackItem[] = data.items
             .filter((item: any) => item?.track?.id && item?.track?.name)
             .map((item: any) => ({
                 id: item.track.id,
@@ -79,6 +80,9 @@ export async function GET(
                 albumImageUrl: item.track.album?.images?.[0]?.url || null,
                 previewUrl: item.track.preview_url || null,
             }));
+
+        // Enrichissement supprimé (User request: rester 100% Spotify natif)
+        // Les tracks sans previewUrl seront filtrés côté client ou gérés par SDK plus tard.
 
         const tracksWithPreview = tracks.filter(t => t.previewUrl).length;
         console.log(`[C1] Playlist ${playlistId}: ${tracksWithPreview}/${tracks.length} tracks avec preview`);

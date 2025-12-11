@@ -42,24 +42,28 @@ export const spotifyConfig = {
    * OAuth scopes required by the application
    * @see https://developer.spotify.com/documentation/web-api/concepts/scopes
    */
-  scopes: [
-    // User profile
-    'user-read-private',
-    'user-read-email',
-    // User's top items
-    'user-top-read',
-    // Listening history
-    'user-read-recently-played',
-    'user-read-playback-state',
-    'user-read-currently-playing',
-    // Playlists
-    'playlist-read-private',
-    'playlist-read-collaborative',
-    'playlist-modify-public',
-    'playlist-modify-private',
-    // Library
-    'user-library-read',
-  ],
+  scopes: (process.env.SPOTIFY_SCOPES
+    ? process.env.SPOTIFY_SCOPES.split(' ')
+    : [
+      // User profile
+      'user-read-private',
+      'user-read-email',
+      // User's top items
+      'user-top-read',
+      // Listening history
+      'user-read-recently-played',
+      'user-read-playback-state',
+      'user-read-currently-playing',
+      'user-modify-playback-state', // Requis pour contrôler le playback
+      'streaming',                  // Requis pour le Web Playback SDK
+      // Playlists
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'playlist-modify-public',
+      'playlist-modify-private',
+      // Library
+      'user-library-read',
+    ]),
 } as const;
 
 /**
@@ -96,7 +100,7 @@ export function validateEnvVariables(): boolean {
   if (missingVars.length > 0) {
     console.warn(
       `⚠️ Missing required environment variables: ${missingVars.join(', ')}\n` +
-        'Copy .env.example to .env.local and fill in the values.'
+      'Copy .env.example to .env.local and fill in the values.'
     );
     return false;
   }

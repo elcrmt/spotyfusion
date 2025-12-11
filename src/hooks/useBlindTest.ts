@@ -1,13 +1,13 @@
 'use client';
 
 // Hook pour gérer la logique du Blind Test (C1-C5)
-// Supporte 2 modes: Audio (avec preview) et Quiz Artiste (sans audio)
+// Version PREMIUM: Utilise le Web Playback SDK pour jouer tous les titres
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { fetchUserPlaylists, fetchPlaylistTracks, PlaylistItem, PlaylistTrackItem } from '@/lib/spotify/playlistClient';
+import { useSpotifyPlayer } from './useSpotifyPlayer';
 
 export type GamePhase = 'loading' | 'select' | 'playing' | 'answered' | 'finished';
-export type GameMode = 'audio' | 'artist'; // audio = deviner le titre, artist = deviner l'artiste
 
 export interface BlindTestQuestion {
     track: PlaylistTrackItem;
@@ -17,7 +17,6 @@ export interface BlindTestQuestion {
 
 export interface BlindTestState {
     phase: GamePhase;
-    mode: GameMode;
     playlists: PlaylistItem[];
     selectedPlaylist: PlaylistItem | null;
     questions: BlindTestQuestion[];
@@ -25,6 +24,7 @@ export interface BlindTestState {
     score: number;
     lastAnswerCorrect: boolean | null;
     error: string | null;
+    isPlayerReady: boolean;
 }
 
 const TOTAL_QUESTIONS = 10;
@@ -42,8 +42,7 @@ function shuffleArray<T>(array: T[]): T[] {
 // Génère les questions à partir des tracks
 function generateQuestions(
     tracks: PlaylistTrackItem[],
-    count: number,
-    mode: GameMode
+    count: number
 ): BlindTestQuestion[] {
     if (tracks.length < 4) {
         throw new Error('Pas assez de tracks pour générer des questions');
@@ -57,23 +56,16 @@ function generateQuestions(
         const correctTrack = shuffledTracks[i];
 
         // Sélectionne 3 mauvaises réponses aléatoires
-        const wrongTracks = shuffledTracks
-            .filter((t) => t.id !== correctTrack.id)
-            .slice(0, 3);
+        const wrongTracks = shuffleArray(tracks.filter((t) => t.id !== correctTrack.id)).slice(0, 3);
 
         if (wrongTracks.length < 3) continue;
 
-        // Mode Audio: options = noms des chansons
-        // Mode Artist: options = noms des artistes
-        const getOptionText = (track: PlaylistTrackItem) =>
-            mode === 'audio' ? track.name : track.artists.join(', ');
-
         const options = shuffleArray([
-            getOptionText(correctTrack),
-            ...wrongTracks.map((t) => getOptionText(t)),
+            correctTrack.name,
+            ...wrongTracks.map((t) => t.name),
         ]);
 
-        const correctIndex = options.indexOf(getOptionText(correctTrack));
+        const correctIndex = options.indexOf(correctTrack.name);
 
         questions.push({
             track: correctTrack,
@@ -86,9 +78,11 @@ function generateQuestions(
 }
 
 export function useBlindTest() {
+    const [token, setToken] = useState<string>('');
+    const { player, deviceId, isReady, playTrack, pause } = useSpotifyPlayer(token);
+
     const [state, setState] = useState<BlindTestState>({
         phase: 'loading',
-        mode: 'audio',
         playlists: [],
         selectedPlaylist: null,
         questions: [],
@@ -96,10 +90,33 @@ export function useBlindTest() {
         score: 0,
         lastAnswerCorrect: null,
         error: null,
+        isPlayerReady: false,
     });
 
-    const audioRef = useRef<HTMLAudioElement | null>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Récupère le token au montage
+    useEffect(() => {
+        fetch('/api/auth/token')
+            .then(res => res.json())
+            .then(data => {
+                if (data.accessToken) setToken(data.accessToken);
+            })
+            .catch(console.error);
+    }, []);
+
+    // Sync player ready state
+    useEffect(() => {
+        setState(s => ({ ...s, isPlayerReady: isReady }));
+    }, [isReady]);
+
+    // Cleanup audio on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+            pause(); // Pause playback on leave
+        };
+    }, [pause]);
 
     // Charge les playlists au démarrage
     const loadPlaylists = useCallback(async () => {
@@ -114,12 +131,20 @@ export function useBlindTest() {
 
     // Sélectionne une playlist et démarre le jeu
     const selectPlaylist = useCallback(async (playlist: PlaylistItem) => {
+        if (!deviceId) {
+            setState((s) => ({
+                ...s,
+                error: 'Le lecteur Spotify n\'est pas prêt. Assurez-vous d\'être Premium et d\'avoir rechargé la page.'
+            }));
+            return;
+        }
+
         try {
             setState((s) => ({ ...s, phase: 'loading', selectedPlaylist: playlist, error: null }));
 
             const data = await fetchPlaylistTracks(playlist.id);
 
-            // Minimum 4 tracks pour avoir 4 options
+            // Minimum 4 tracks
             if (data.items.length < 4) {
                 setState((s) => ({
                     ...s,
@@ -129,33 +154,42 @@ export function useBlindTest() {
                 return;
             }
 
-            // Détermine le mode: audio si assez de previews, sinon mode artiste
-            const tracksWithPreview = data.items.filter(t => t.previewUrl);
-            const useAudioMode = tracksWithPreview.length >= 4;
-            const mode: GameMode = useAudioMode ? 'audio' : 'artist';
-
-            // Utilise les tracks avec preview en mode audio, sinon tous les tracks
-            const tracksToUse = useAudioMode ? tracksWithPreview : data.items;
-
-            const questionsCount = Math.min(TOTAL_QUESTIONS, tracksToUse.length);
-            const questions = generateQuestions(tracksToUse, questionsCount, mode);
+            // Génère les questions (PLUS BESOIN DE PREVIEW URL !)
+            const questionsCount = Math.min(TOTAL_QUESTIONS, data.items.length);
+            const questions = generateQuestions(data.items, questionsCount);
 
             setState((s) => ({
                 ...s,
                 phase: 'playing',
-                mode,
                 questions,
                 currentQuestionIndex: 0,
                 score: 0,
                 lastAnswerCorrect: null,
             }));
+
+            // Lance la première musique
+            if (questions.length > 0) {
+                const firstTrackUri = `spotify:track:${questions[0].track.id}`;
+                await playTrack(firstTrackUri);
+
+                // Arrête après 30s
+                if (timerRef.current) clearTimeout(timerRef.current);
+                timerRef.current = setTimeout(() => {
+                    pause();
+                }, 30000);
+            }
+
         } catch (error) {
+            console.error(error);
             setState((s) => ({ ...s, phase: 'select', error: 'Erreur de chargement des tracks' }));
         }
-    }, []);
+    }, [deviceId, playTrack, pause]);
 
     // Soumet une réponse
     const submitAnswer = useCallback((selectedIndex: number) => {
+        pause(); // Stop music immediate
+        if (timerRef.current) clearTimeout(timerRef.current);
+
         setState((s) => {
             if (s.phase !== 'playing') return s;
 
@@ -169,16 +203,28 @@ export function useBlindTest() {
                 lastAnswerCorrect: isCorrect,
             };
         });
-    }, []);
+    }, [pause]);
 
     // Passe à la question suivante
-    const nextQuestion = useCallback(() => {
+    const nextQuestion = useCallback(async () => {
         setState((s) => {
             const nextIndex = s.currentQuestionIndex + 1;
 
             if (nextIndex >= s.questions.length) {
                 return { ...s, phase: 'finished' };
             }
+
+            // Lance la musique suivante (side effect, a bit dirty but works within hook logic for now)
+            setTimeout(async () => {
+                const nextTrack = s.questions[nextIndex].track;
+                const nextUri = `spotify:track:${nextTrack.id}`;
+                await playTrack(nextUri);
+
+                if (timerRef.current) clearTimeout(timerRef.current);
+                timerRef.current = setTimeout(() => {
+                    pause();
+                }, 30000);
+            }, 0);
 
             return {
                 ...s,
@@ -187,14 +233,14 @@ export function useBlindTest() {
                 lastAnswerCorrect: null,
             };
         });
-    }, []);
+    }, [playTrack, pause]);
 
     // Rejouer
     const restart = useCallback(() => {
+        pause();
         setState((s) => ({
             ...s,
             phase: 'select',
-            mode: 'audio',
             selectedPlaylist: null,
             questions: [],
             currentQuestionIndex: 0,
@@ -202,17 +248,10 @@ export function useBlindTest() {
             lastAnswerCorrect: null,
             error: null,
         }));
-    }, []);
+    }, [pause]);
 
     // Question actuelle
     const currentQuestion = state.questions[state.currentQuestionIndex] || null;
-
-    // Cleanup audio on unmount
-    useEffect(() => {
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, []);
 
     return {
         ...state,
@@ -223,6 +262,6 @@ export function useBlindTest() {
         submitAnswer,
         nextQuestion,
         restart,
-        audioRef,
+        isPlayerReady: isReady
     };
 }

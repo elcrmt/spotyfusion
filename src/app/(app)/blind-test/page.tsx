@@ -9,7 +9,6 @@ import { PlaylistSelector, GameScreen, EndScreen } from '@/components/BlindTest'
 export default function BlindTestPage() {
   const {
     phase,
-    mode,
     playlists,
     selectedPlaylist,
     currentQuestion,
@@ -71,7 +70,7 @@ export default function BlindTestPage() {
           questionNumber={currentQuestionIndex + 1}
           totalQuestions={totalQuestions}
           score={score}
-          mode={mode}
+
           onAnswer={submitAnswer}
           onNext={nextQuestion}
           isAnswered={phase === 'answered'}
