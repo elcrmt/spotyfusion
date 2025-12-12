@@ -115,11 +115,11 @@ export function AppNavigation() {
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${isActive
-                        ? 'bg-[#1a1a1a] text-white before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-green-500 before:rounded-l-md'
-                        : 'text-[#b3b3b3] hover:text-white'
+                      ? 'bg-[#1a1a1a] text-white before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-green-500 before:rounded-l-md'
+                      : 'text-[#b3b3b3] hover:text-white'
                       }`}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-green-500' : ''}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
                     {item.label}
                   </Link>
                 </li>
