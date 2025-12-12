@@ -265,7 +265,7 @@ export default function MoodGeneratorPage() {
         <button
           onClick={handleGenerate}
           disabled={seeds.length === 0 || isLoading}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-black font-semibold rounded-full hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <Sparkles className="w-5 h-5" />
           {isLoading ? 'Génération en cours...' : 'Générer les recommandations'}
