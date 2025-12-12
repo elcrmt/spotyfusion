@@ -3,6 +3,7 @@
 // Composant de sélection de playlist (C1)
 
 import { PlaylistItem } from '@/lib/spotify/playlistClient';
+import { Music } from 'lucide-react';
 
 interface PlaylistSelectorProps {
     playlists: PlaylistItem[];
@@ -51,7 +52,7 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                            <span className="text-3xl sm:text-4xl">🎵</span>
+                            <Music className="w-12 h-12 sm:w-16 sm:h-16 text-zinc-600" />
                         </div>
                     )}
 

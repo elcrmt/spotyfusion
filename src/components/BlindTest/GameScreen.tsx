@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { AnswerButtons } from './AnswerButtons';
 import { BlindTestQuestion } from '@/hooks/useBlindTest';
+import { Music } from 'lucide-react';
 
 interface GameScreenProps {
     question: BlindTestQuestion;
@@ -76,7 +77,7 @@ export function GameScreen({
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                        <span className="text-4xl sm:text-6xl">🎵</span>
+                        <Music className="w-16 h-16 sm:w-20 sm:h-20 text-zinc-600" />
                     </div>
                 )}
             </div>

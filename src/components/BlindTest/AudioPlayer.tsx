@@ -3,6 +3,7 @@
 // Lecteur audio avec timer 30 secondes (C2)
 
 import { useEffect, useRef, useState } from 'react';
+import { Headphones } from 'lucide-react';
 
 interface AudioPlayerProps {
     isPlaying: boolean;
@@ -101,9 +102,10 @@ export function AudioPlayer({ isPlaying }: AudioPlayerProps) {
                     </div>
                 )}
 
-                <p className="text-zinc-400 text-sm">
-                    {isPlaying ? "🎧 Écoutez l'extrait !" : "Prêt ?"}
-                </p>
+                <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                    {isPlaying && <Headphones className="w-4 h-4 text-green-500" />}
+                    <p>{isPlaying ? "Écoutez l'extrait !" : "Prêt ?"}</p>
+                </div>
             </div>
         </div>
     );

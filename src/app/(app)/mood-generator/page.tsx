@@ -14,6 +14,7 @@ import {
   type Seed,
   type RecommendedTrack,
 } from '@/lib/spotify/spotifyClient';
+import { Palette } from 'lucide-react';
 
 export default function MoodGeneratorPage() {
   // États D1/D2
@@ -119,8 +120,13 @@ export default function MoodGeneratorPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">🎨 Mood Playlist</h1>
-      <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8">Générez une playlist selon votre humeur</p>
+      <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <Palette className="w-8 h-8 sm:w-10 sm:h-10 text-green-500" />
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Mood Playlist</h1>
+          <p className="text-sm sm:text-base text-zinc-400">Générez une playlist selon votre humeur</p>
+        </div>
+      </div>
 
       <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-2">
         {/* Panneau de configuration (gauche) */}

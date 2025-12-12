@@ -2,6 +2,8 @@
 
 // Écran de fin de jeu (C5)
 
+import { Trophy, Star, ThumbsUp, Headphones, Dumbbell, RotateCcw } from 'lucide-react';
+
 interface EndScreenProps {
     score: number;
     totalQuestions: number;
@@ -12,19 +14,21 @@ export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) 
     const percentage = Math.round((score / totalQuestions) * 100);
 
     const getMessage = () => {
-        if (percentage === 100) return { emoji: '🏆', text: 'Parfait ! Tu es un vrai mélomane !' };
-        if (percentage >= 80) return { emoji: '🌟', text: 'Excellent ! Tu connais bien ta musique !' };
-        if (percentage >= 60) return { emoji: '👍', text: 'Pas mal ! Continue à écouter !' };
-        if (percentage >= 40) return { emoji: '🎧', text: 'Tu peux faire mieux, réécoute tes playlists !' };
-        return { emoji: '💪', text: 'Ne lâche rien, la musique s\'apprend !' };
+        if (percentage === 100) return { Icon: Trophy, text: 'Parfait ! Tu es un vrai mélomane !', color: 'text-yellow-500' };
+        if (percentage >= 80) return { Icon: Star, text: 'Excellent ! Tu connais bien ta musique !', color: 'text-green-500' };
+        if (percentage >= 60) return { Icon: ThumbsUp, text: 'Pas mal ! Continue à écouter !', color: 'text-blue-500' };
+        if (percentage >= 40) return { Icon: Headphones, text: 'Tu peux faire mieux, réécoute tes playlists !', color: 'text-orange-500' };
+        return { Icon: Dumbbell, text: 'Ne lâche rien, la musique s\'apprend !', color: 'text-purple-500' };
     };
 
-    const { emoji, text } = getMessage();
+    const { Icon, text, color } = getMessage();
 
     return (
         <div className="flex flex-col items-center justify-center text-center py-8 sm:py-12 px-4">
-            {/* Emoji animé */}
-            <div className="text-5xl sm:text-6xl md:text-8xl mb-4 sm:mb-6 animate-bounce">{emoji}</div>
+            {/* Icône animée */}
+            <div className={`mb-4 sm:mb-6 animate-bounce ${color}`}>
+                <Icon className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" />
+            </div>
 
             {/* Score */}
             <div className="mb-3 sm:mb-4">
@@ -52,7 +56,7 @@ export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) 
                     onClick={onRestart}
                     className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-green-500 hover:bg-green-400 text-white font-semibold text-sm sm:text-base transition-all hover:scale-105 flex items-center gap-2"
                 >
-                    <span>🔄</span>
+                    <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
                     Rejouer
                 </button>
             </div>

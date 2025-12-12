@@ -7,11 +7,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { BarChart3, Music, Palette, Headphones, Star, LogOut } from 'lucide-react';
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/blind-test', label: 'Blind Test', icon: '🎵' },
-  { href: '/mood-generator', label: 'Mood Playlist', icon: '🎨' },
+  { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+  { href: '/blind-test', label: 'Blind Test', icon: Music },
+  { href: '/mood-generator', label: 'Mood Playlist', icon: Palette },
 ];
 
 export function AppNavigation() {
@@ -22,7 +23,7 @@ export function AppNavigation() {
   // Label pour le type d'abonnement (A3)
   const getProductLabel = () => {
     if (!user?.product) return 'Spotify';
-    if (user.product === 'premium') return '⭐ Premium';
+    if (user.product === 'premium') return 'Premium';
     return 'Free';
   };
 
@@ -31,7 +32,7 @@ export function AppNavigation() {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🎧</span>
+          <Headphones className="w-6 h-6 text-green-500" />
           <h1 className="text-lg font-bold text-white">SpotyFusion</h1>
         </div>
         <button
@@ -67,14 +68,14 @@ export function AppNavigation() {
       `}>
         {/* Logo - Desktop only */}
         <div className="hidden lg:flex items-center gap-3 p-6 border-b border-zinc-800">
-          <span className="text-3xl">🎧</span>
+          <Headphones className="w-8 h-8 text-green-500" />
           <h1 className="text-xl font-bold text-white">SpotyFusion</h1>
         </div>
 
         {/* Mobile Header in Sidebar */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-zinc-800">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🎧</span>
+            <Headphones className="w-6 h-6 text-green-500" />
             <h1 className="text-lg font-bold text-white">SpotyFusion</h1>
           </div>
           <button
@@ -92,6 +93,7 @@ export function AppNavigation() {
         <ul className="space-y-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
+            const Icon = item.icon;
             return (
               <li key={item.href}>
                 <Link
@@ -102,7 +104,7 @@ export function AppNavigation() {
                       : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                   }`}
                 >
-                  <span className="text-xl">{item.icon}</span>
+                  <Icon className="w-5 h-5" />
                   {item.label}
                 </Link>
               </li>
@@ -144,7 +146,8 @@ export function AppNavigation() {
                 <p className="truncate text-sm font-medium text-white">
                   {user?.displayName || 'Utilisateur'}
                 </p>
-                <p className="truncate text-xs text-zinc-400">
+                <p className="truncate text-xs text-zinc-400 flex items-center gap-1">
+                  {user?.product === 'premium' && <Star className="w-3 h-3" />}
                   {getProductLabel()}
                 </p>
               </>
@@ -157,7 +160,7 @@ export function AppNavigation() {
             className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors"
             title="Se déconnecter"
           >
-            🚪
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>

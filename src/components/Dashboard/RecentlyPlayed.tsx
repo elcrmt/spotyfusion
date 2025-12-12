@@ -8,6 +8,7 @@ import {
   fetchRecentlyPlayed,
   RecentTrack,
 } from '@/lib/spotify/spotifyClient';
+import { Clock, Disc3 } from 'lucide-react';
 
 // Formate l'horodatage en format lisible (B3)
 function formatPlayedAt(isoString: string): string {
@@ -81,7 +82,10 @@ export function RecentlyPlayed() {
   if (isLoading) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🕐 Récemment écouté</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Clock className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Récemment écouté</h2>
+        </div>
         <div className="space-y-2 sm:space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2 sm:gap-4 animate-pulse">
@@ -102,7 +106,10 @@ export function RecentlyPlayed() {
   if (error) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🕐 Récemment écouté</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Clock className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Récemment écouté</h2>
+        </div>
         <div className="text-center py-6 sm:py-8">
           <p className="text-red-400 mb-2 text-sm sm:text-base">⚠️ {error}</p>
           <p className="text-zinc-500 text-xs mb-3 sm:mb-4 px-4">
@@ -123,7 +130,10 @@ export function RecentlyPlayed() {
   if (tracks.length === 0) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🕐 Récemment écouté</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Clock className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Récemment écouté</h2>
+        </div>
         <p className="text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base px-4">
           Aucune écoute récente trouvée.
         </p>
@@ -133,7 +143,10 @@ export function RecentlyPlayed() {
 
   return (
     <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-      <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🕐 Récemment écouté</h2>
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Clock className="w-5 h-5 text-green-500" />
+        <h2 className="text-base sm:text-lg font-semibold text-white">Récemment écouté</h2>
+      </div>
       <ul className="space-y-2 sm:space-y-3">
         {tracks.map((track, index) => (
           <li key={`${track.id}-${index}`}>
@@ -155,7 +168,7 @@ export function RecentlyPlayed() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-lg sm:text-xl">
-                    💿
+                    <Disc3 className="w-6 h-6 text-zinc-500" />
                   </div>
                 )}
               </div>

@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { useBlindTest } from '@/hooks/useBlindTest';
 import { PlaylistSelector, GameScreen, EndScreen } from '@/components/BlindTest';
+import { Music } from 'lucide-react';
 
 export default function BlindTestPage() {
   const {
@@ -31,14 +32,19 @@ export default function BlindTestPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">🎵 Blind Test</h1>
-      <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8">
-        {phase === 'select' && 'Sélectionnez une playlist pour commencer'}
-        {phase === 'playing' && selectedPlaylist?.name}
-        {phase === 'answered' && selectedPlaylist?.name}
-        {phase === 'finished' && 'Partie terminée !'}
-        {phase === 'loading' && 'Chargement...'}
-      </p>
+      <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <Music className="w-8 h-8 sm:w-10 sm:h-10 text-green-500" />
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Blind Test</h1>
+          <p className="text-sm sm:text-base text-zinc-400">
+            {phase === 'select' && 'Sélectionnez une playlist pour commencer'}
+            {phase === 'playing' && selectedPlaylist?.name}
+            {phase === 'answered' && selectedPlaylist?.name}
+            {phase === 'finished' && 'Partie terminée !'}
+            {phase === 'loading' && 'Chargement...'}
+          </p>
+        </div>
+      </div>
 
       {/* Message d'erreur */}
       {error && (

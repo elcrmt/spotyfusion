@@ -9,6 +9,7 @@ import {
   TopTrack,
   TopTimeRange,
 } from '@/lib/spotify/spotifyClient';
+import { Music2, Disc3 } from 'lucide-react';
 
 interface TopTracksProps {
   timeRange?: TopTimeRange;
@@ -48,7 +49,10 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   if (isLoading) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎶 Top 10 Titres</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Music2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
+        </div>
         <div className="space-y-2 sm:space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2 sm:gap-4 animate-pulse">
@@ -69,7 +73,10 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   if (error) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎶 Top 10 Titres</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Music2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
+        </div>
         <div className="text-center py-6 sm:py-8">
           <p className="text-red-400 mb-2 text-sm sm:text-base">⚠️ {error}</p>
           <p className="text-zinc-500 text-xs mb-3 sm:mb-4 px-4">
@@ -90,7 +97,10 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   if (tracks.length === 0) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎶 Top 10 Titres</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Music2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
+        </div>
         <p className="text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base px-4">
           Pas encore assez d&apos;écoutes pour afficher vos top titres.
         </p>
@@ -100,7 +110,10 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
 
   return (
     <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-      <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎶 Top 10 Titres</h2>
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Music2 className="w-5 h-5 text-green-500" />
+        <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
+      </div>
       <ul className="space-y-2 sm:space-y-3">
         {tracks.map((track, index) => (
           <li key={track.id}>
@@ -127,7 +140,7 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-lg sm:text-xl">
-                    💿
+                    <Disc3 className="w-6 h-6 text-zinc-500" />
                   </div>
                 )}
               </div>

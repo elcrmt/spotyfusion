@@ -4,6 +4,7 @@
 
 import Image from 'next/image';
 import type { RecommendedTrack } from '@/lib/spotify/spotifyClient';
+import { ListMusic, Zap, Disc3, Headphones } from 'lucide-react';
 
 interface RecommendationsListProps {
     tracks: RecommendedTrack[];
@@ -36,7 +37,7 @@ function EnergyScore({ energy }: { energy?: number }) {
 
     return (
         <div className="flex items-center gap-1.5">
-            <span className="text-xs">⚡</span>
+            <Zap className="w-3.5 h-3.5" />
             <div className="flex items-center gap-1">
                 <div className="w-12 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
                     <div
@@ -64,9 +65,12 @@ export function RecommendationsList({
     if (isLoading) {
         return (
             <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
-                    🎵 Recommandations
-                </h2>
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <ListMusic className="w-5 h-5 text-green-500" />
+                    <h2 className="text-base sm:text-lg font-semibold text-white">
+                        Recommandations
+                    </h2>
+                </div>
                 <div className="flex flex-col items-center justify-center py-10 sm:py-12">
                     <div className="h-8 w-8 sm:h-10 sm:w-10 animate-spin rounded-full border-4 border-zinc-700 border-t-green-500 mb-3 sm:mb-4" />
                     <p className="text-zinc-400 text-sm sm:text-base">Génération en cours...</p>
@@ -82,9 +86,12 @@ export function RecommendationsList({
     if (error) {
         return (
             <div className="rounded-xl bg-zinc-900 border border-red-900/50 p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
-                    🎵 Recommandations
-                </h2>
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <ListMusic className="w-5 h-5 text-green-500" />
+                    <h2 className="text-base sm:text-lg font-semibold text-white">
+                        Recommandations
+                    </h2>
+                </div>
                 <div className="text-center py-6 sm:py-8">
                     <div className="text-3xl sm:text-4xl mb-3">⚠️</div>
                     <p className="text-red-400 mb-2 font-medium text-sm sm:text-base">Erreur de génération</p>
@@ -101,11 +108,14 @@ export function RecommendationsList({
     if (tracks.length === 0) {
         return (
             <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
-                    🎵 Recommandations
-                </h2>
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <ListMusic className="w-5 h-5 text-green-500" />
+                    <h2 className="text-base sm:text-lg font-semibold text-white">
+                        Recommandations
+                    </h2>
+                </div>
                 <div className="text-center py-10 sm:py-12">
-                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎧</div>
+                    <Headphones className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-zinc-700" />
                     <p className="text-zinc-400 mb-2 text-sm sm:text-base px-4">Aucune recommandation générée</p>
                     <p className="text-zinc-500 text-xs sm:text-sm px-4">
                         Ajoutez des semences et cliquez sur &quot;Générer&quot; pour obtenir des recommandations.
@@ -118,9 +128,12 @@ export function RecommendationsList({
     return (
         <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                    🎵 Recommandations
-                </h2>
+                <div className="flex items-center gap-2">
+                    <ListMusic className="w-5 h-5 text-green-500" />
+                    <h2 className="text-base sm:text-lg font-semibold text-white">
+                        Recommandations
+                    </h2>
+                </div>
                 <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded">
                     {tracks.length} titres
                 </span>
@@ -162,7 +175,7 @@ export function RecommendationsList({
                                     />
                                 ) : (
                                     <div className="flex h-full w-full items-center justify-center text-lg sm:text-xl">
-                                        💿
+                                        <Disc3 className="w-6 h-6 text-zinc-500" />
                                     </div>
                                 )}
                             </div>

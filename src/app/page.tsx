@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { Headphones } from 'lucide-react';
 
 function SpotifyLogo({ className = '' }: { className?: string }) {
   return (
@@ -38,9 +39,12 @@ export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4">
-          🎧 SpotyFusion
-        </h1>
+        <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
+          <Headphones className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 text-green-500" />
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+            SpotyFusion
+          </h1>
+        </div>
         <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-md mx-auto">
           Statistiques, Blind Test et Playlists personnalisées
         </p>

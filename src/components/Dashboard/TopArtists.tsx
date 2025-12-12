@@ -9,6 +9,7 @@ import {
   TopArtist,
   TopTimeRange,
 } from '@/lib/spotify/spotifyClient';
+import { Mic2, Flame } from 'lucide-react';
 
 interface TopArtistsProps {
   timeRange?: TopTimeRange;
@@ -41,7 +42,10 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
   if (isLoading) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎵 Top 10 Artistes</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Mic2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Artistes</h2>
+        </div>
         <div className="space-y-2 sm:space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2 sm:gap-4 animate-pulse">
@@ -62,7 +66,10 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
   if (error) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎵 Top 10 Artistes</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Mic2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Artistes</h2>
+        </div>
         <div className="text-center py-6 sm:py-8">
           <p className="text-red-400 mb-2 text-sm sm:text-base">⚠️ {error}</p>
           <p className="text-zinc-500 text-xs mb-3 sm:mb-4 px-4">
@@ -83,7 +90,10 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
   if (artists.length === 0) {
     return (
       <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎵 Top 10 Artistes</h2>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Mic2 className="w-5 h-5 text-green-500" />
+          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Artistes</h2>
+        </div>
         <p className="text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base px-4">
           Pas encore assez d&apos;écoutes pour afficher vos top artistes.
         </p>
@@ -93,7 +103,10 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
 
   return (
     <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-      <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">🎵 Top 10 Artistes</h2>
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Mic2 className="w-5 h-5 text-green-500" />
+        <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Artistes</h2>
+      </div>
       <ul className="space-y-2 sm:space-y-3">
         {artists.map((artist, index) => (
           <li key={artist.id}>
@@ -120,7 +133,7 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-lg sm:text-xl">
-                    🎤
+                    <Mic2 className="w-6 h-6 text-zinc-500" />
                   </div>
                 )}
               </div>
@@ -135,7 +148,7 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
 
               {/* Popularité */}
               <div className="flex items-center gap-1 text-xs text-zinc-500">
-                <span>🔥</span>
+                <Flame className="w-3.5 h-3.5 text-orange-500" />
                 <span>{artist.popularity}</span>
               </div>
             </a>
