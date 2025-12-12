@@ -30,9 +30,9 @@ export default function BlindTestPage() {
   }, [loadPlaylists]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-white mb-2">🎵 Blind Test</h1>
-      <p className="text-zinc-400 mb-8">
+    <div className="px-4 sm:px-6 lg:px-8">
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">🎵 Blind Test</h1>
+      <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8">
         {phase === 'select' && 'Sélectionnez une playlist pour commencer'}
         {phase === 'playing' && selectedPlaylist?.name}
         {phase === 'answered' && selectedPlaylist?.name}
@@ -42,7 +42,7 @@ export default function BlindTestPage() {
 
       {/* Message d'erreur */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm sm:text-base">
           {error}
         </div>
       )}

@@ -13,7 +13,7 @@ interface PlaylistSelectorProps {
 export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSelectorProps) {
     if (isLoading) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[...Array(8)].map((_, i) => (
                     <div
                         key={i}
@@ -26,9 +26,9 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
 
     if (playlists.length === 0) {
         return (
-            <div className="text-center py-12">
-                <p className="text-zinc-400">Aucune playlist trouvée</p>
-                <p className="text-zinc-500 text-sm mt-2">
+            <div className="text-center py-8 sm:py-12 px-4">
+                <p className="text-zinc-400 text-sm sm:text-base">Aucune playlist trouvée</p>
+                <p className="text-zinc-500 text-xs sm:text-sm mt-2">
                     Créez des playlists sur Spotify pour jouer au Blind Test
                 </p>
             </div>
@@ -36,7 +36,7 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
     }
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {playlists.map((playlist) => (
                 <button
                     key={playlist.id}
@@ -51,7 +51,7 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                            <span className="text-4xl">🎵</span>
+                            <span className="text-3xl sm:text-4xl">🎵</span>
                         </div>
                     )}
 
@@ -59,8 +59,8 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                     {/* Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                        <h3 className="text-white font-semibold text-sm truncate">
+                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+                        <h3 className="text-white font-semibold text-xs sm:text-sm truncate">
                             {playlist.name}
                         </h3>
                         <p className="text-zinc-400 text-xs">
@@ -70,8 +70,8 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
 
                     {/* Play icon on hover */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
-                            <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                            <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z" />
                             </svg>
                         </div>

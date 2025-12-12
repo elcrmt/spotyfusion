@@ -118,25 +118,25 @@ export default function MoodGeneratorPage() {
   const canGenerate = seeds.length > 0;
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-white mb-2">🎨 Mood Playlist</h1>
-      <p className="text-zinc-400 mb-8">Générez une playlist selon votre humeur</p>
+    <div className="px-4 sm:px-6 lg:px-8">
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">🎨 Mood Playlist</h1>
+      <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8">Générez une playlist selon votre humeur</p>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-2">
         {/* Panneau de configuration (gauche) */}
         <div>
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-8 space-y-8">
+          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
             <div>
-              <h2 className="text-xl font-semibold text-white mb-2 text-center">
+              <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 text-center">
                 Ajustez l&apos;ambiance
               </h2>
-              <p className="text-zinc-400 text-sm text-center mb-8">
+              <p className="text-zinc-400 text-xs sm:text-sm text-center mb-6 sm:mb-8">
                 Personnalisez votre playlist avec les caractéristiques audio et des semences
               </p>
             </div>
 
             {/* Sélecteur de semences (D2) */}
-            <div className="pb-8 border-b border-zinc-800">
+            <div className="pb-6 sm:pb-8 border-b border-zinc-800">
               <SeedSelector seeds={seeds} onSeedsChange={handleSeedsChange} maxSeeds={5} />
             </div>
 

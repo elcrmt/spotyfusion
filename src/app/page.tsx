@@ -36,19 +36,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4">
-      <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold text-white mb-4">🎧 SpotyFusion</h1>
-        <p className="text-zinc-400 text-lg">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4">
+          🎧 SpotyFusion
+        </h1>
+        <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-md mx-auto">
           Statistiques, Blind Test et Playlists personnalisées
         </p>
       </div>
 
       <button
         onClick={login}
-        className="flex items-center gap-3 rounded-full bg-green-500 px-8 py-4 font-semibold text-white transition-transform hover:scale-105 hover:bg-green-400"
+        className="flex items-center gap-2 sm:gap-3 rounded-full bg-green-500 px-6 sm:px-8 py-3 sm:py-4 font-semibold text-white text-sm sm:text-base transition-transform hover:scale-105 hover:bg-green-400"
       >
-        <SpotifyLogo className="h-6 w-6" />
+        <SpotifyLogo className="h-5 w-5 sm:h-6 sm:w-6" />
         Se connecter avec Spotify
       </button>
     </div>

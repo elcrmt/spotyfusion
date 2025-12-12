@@ -17,20 +17,20 @@ export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState<TopTimeRange>('medium_term');
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div className="px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">📊 Dashboard</h1>
-          <p className="text-zinc-400">Vos statistiques d&apos;écoute Spotify</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">📊 Dashboard</h1>
+          <p className="text-sm sm:text-base text-zinc-400">Vos statistiques d&apos;écoute Spotify</p>
         </div>
 
         {/* Sélecteur de période (B1) */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(Object.keys(timeRangeLabels) as TopTimeRange[]).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 text-sm rounded-full transition-colors ${
+              className={`px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-full transition-colors whitespace-nowrap ${
                 timeRange === range
                   ? 'bg-green-500 text-black font-medium'
                   : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
@@ -43,13 +43,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Top 10 Artistes et Top 10 Titres (B1) */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
         <TopArtists timeRange={timeRange} />
         <TopTracks timeRange={timeRange} />
       </div>
 
       {/* Récemment écouté (B3) */}
-      <div className="mt-6">
+      <div className="mt-4 sm:mt-6">
         <RecentlyPlayed />
       </div>
     </div>

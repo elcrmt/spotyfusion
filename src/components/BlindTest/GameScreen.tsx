@@ -42,19 +42,19 @@ export function GameScreen({
     }
 
     return (
-        <div className="flex flex-col items-center gap-6 w-full max-w-3xl mx-auto">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-3xl mx-auto px-4">
             {/* Header avec score et progression */}
             <div className="w-full flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-zinc-400 text-sm">Question</span>
-                    <span className="text-white font-bold text-lg">
+                <div className="flex items-center gap-1 sm:gap-2">
+                    <span className="text-zinc-400 text-xs sm:text-sm">Question</span>
+                    <span className="text-white font-bold text-base sm:text-lg">
                         {questionNumber}/{totalQuestions}
                     </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <span className="text-zinc-400 text-sm">Score</span>
-                    <span className="text-green-400 font-bold text-lg">{score}</span>
+                <div className="flex items-center gap-1 sm:gap-2">
+                    <span className="text-zinc-400 text-xs sm:text-sm">Score</span>
+                    <span className="text-green-400 font-bold text-base sm:text-lg">{score}</span>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@ export function GameScreen({
             </div>
 
             {/* Album cover */}
-            <div className="relative w-48 h-48 rounded-xl overflow-hidden bg-zinc-800 shadow-2xl">
+            <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-xl overflow-hidden bg-zinc-800 shadow-2xl">
                 {isAnswered && question.track.albumImageUrl ? (
                     <img
                         src={question.track.albumImageUrl}
@@ -76,7 +76,7 @@ export function GameScreen({
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                        <span className="text-6xl">🎵</span>
+                        <span className="text-4xl sm:text-6xl">🎵</span>
                     </div>
                 )}
             </div>
@@ -95,21 +95,21 @@ export function GameScreen({
 
             {/* Feedback et bouton suivant */}
             {isAnswered && (
-                <div className="flex flex-col items-center gap-4 animate-fade-in">
-                    <div className={`text-lg font-semibold ${lastAnswerCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                <div className="flex flex-col items-center gap-3 sm:gap-4 animate-fade-in w-full">
+                    <div className={`text-base sm:text-lg font-semibold ${lastAnswerCorrect ? 'text-green-400' : 'text-red-400'}`}>
                         {lastAnswerCorrect ? '✓ Correct !' : '✗ Mauvaise réponse'}
                     </div>
 
                     <div className="text-center">
-                        <p className="text-white font-medium">{question.track.name}</p>
-                        <p className="text-zinc-400 text-sm">
+                        <p className="text-white font-medium text-sm sm:text-base">{question.track.name}</p>
+                        <p className="text-zinc-400 text-xs sm:text-sm">
                             {question.track.artists.join(', ')}
                         </p>
                     </div>
 
                     <button
                         onClick={onNext}
-                        className="mt-2 px-8 py-3 rounded-full bg-green-500 hover:bg-green-400 text-white font-semibold transition-all hover:scale-105"
+                        className="mt-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-green-500 hover:bg-green-400 text-white text-sm sm:text-base font-semibold transition-all hover:scale-105"
                     >
                         {questionNumber === totalQuestions ? 'Voir le résultat' : 'Question suivante →'}
                     </button>

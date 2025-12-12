@@ -34,35 +34,35 @@ export function AnswerButtons({
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full max-w-2xl">
             {options.map((option, index) => (
                 <button
                     key={index}
                     onClick={() => !isAnswered && onAnswer(index)}
                     disabled={isAnswered}
                     className={`
-            relative p-4 rounded-xl border-2 text-left transition-all
+            relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all
             ${getButtonStyle(index)}
             ${!isAnswered && 'cursor-pointer active:scale-98'}
             ${isAnswered && 'cursor-default'}
           `}
                 >
                     {/* Numéro de l'option */}
-                    <span className="absolute top-2 left-3 text-xs opacity-50">
+                    <span className="absolute top-2 left-2 sm:left-3 text-xs opacity-50">
                         {String.fromCharCode(65 + index)}
                     </span>
 
                     {/* Texte de la réponse */}
-                    <span className="block mt-3 font-medium truncate">
+                    <span className="block mt-2 sm:mt-3 font-medium text-sm sm:text-base truncate pr-6">
                         {option}
                     </span>
 
                     {/* Icône de résultat */}
                     {isAnswered && index === correctIndex && (
-                        <span className="absolute top-2 right-3 text-green-400">✓</span>
+                        <span className="absolute top-2 right-2 sm:right-3 text-green-400">✓</span>
                     )}
                     {isAnswered && index === selectedIndex && index !== correctIndex && (
-                        <span className="absolute top-2 right-3 text-red-400">✗</span>
+                        <span className="absolute top-2 right-2 sm:right-3 text-red-400">✗</span>
                     )}
                 </button>
             ))}
