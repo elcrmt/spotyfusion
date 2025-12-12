@@ -82,64 +82,130 @@ export async function GET(request: NextRequest) {
         if (targetEnergy) params.append('target_energy', targetEnergy);
         if (targetValence) params.append('target_valence', targetValence);
 
-        console.log('[D3] Appel recommendations avec params:', params.toString());
+        console.log('[D3] Génération de recommandations alternatives (sans API Recommendations)');
 
-        // Appel à l'API Spotify Recommendations
-        const response = await fetch(
-            `https://api.spotify.com/v1/recommendations?${params}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
+        // ============================================
+        // SOLUTION ALTERNATIVE : Sans API Recommendations
+        // ============================================
+        // 1. Récupérer les top tracks des artistes seeds
+        // 2. Faire des recherches par genre si des genres sont fournis
+        // 3. Récupérer les audio features et filtrer selon les critères
+        
+        const allTracks:    any[] = [];
+        const targetLimit = parseInt(limit);
+
+        // Étape 1 : Top tracks des artistes
+        if (seedArtists) {
+            const artistIds = seedArtists.split(',');
+            for (const artistId of artistIds.slice(0, 3)) { // Max 3 artistes pour éviter trop d'appels
+                try {
+                    const topTracksResponse = await fetch(
+                        `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=FR`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                        }
+                    );
+
+                    if (topTracksResponse.ok) {
+                        const topTracksData = await topTracksResponse.json();
+                        allTracks.push(...(topTracksData.tracks || []).slice(0, 10));
+                    }
+                } catch (err) {
+                    console.warn(`[D3] Erreur récupération top tracks artiste ${artistId}:`, err);
+                }
             }
+        }
+
+        // Étape 2 : Recherche par genre
+        if (seedGenres) {
+            const genres = seedGenres.split(',');
+            for (const genre of genres.slice(0, 2)) { // Max 2 genres
+                try {
+                    // Recherche de tracks populaires dans ce genre
+                    const searchResponse = await fetch(
+                        `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=20&market=FR`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                        }
+                    );
+
+                    if (searchResponse.ok) {
+                        const searchData = await searchResponse.json();
+                        allTracks.push(...(searchData.tracks?.items || []));
+                    }
+                } catch (err) {
+                    console.warn(`[D3] Erreur recherche genre ${genre}:`, err);
+                }
+            }
+        }
+
+        // Étape 3 : Si on a des track seeds, on les ajoute aussi
+        if (seedTracks) {
+            const trackIds = seedTracks.split(',');
+            for (const trackId of trackIds) {
+                try {
+                    const trackResponse = await fetch(
+                        `https://api.spotify.com/v1/tracks/${trackId}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                        }
+                    );
+
+                    if (trackResponse.ok) {
+                        const trackData = await trackResponse.json();
+                        allTracks.push(trackData);
+                    }
+                } catch (err) {
+                    console.warn(`[D3] Erreur récupération track ${trackId}:`, err);
+                }
+            }
+        }
+
+        // Déduplique les tracks par ID
+        const uniqueTracks = Array.from(
+            new Map(allTracks.map(track => [track.id, track])).values()
         );
 
-        // Token expiré ou invalide
-        if (response.status === 401) {
-            console.error('[D3] Token Spotify invalide ou expiré');
-            return NextResponse.json({ error: 'TOKEN_EXPIRED' }, { status: 401 });
+        console.log(`[D3] ${uniqueTracks.length} tracks uniques collectées`);
+
+        // Si on n'a pas assez de tracks, on fait une recherche générique
+        if (uniqueTracks.length < targetLimit) {
+            try {
+                const fallbackGenre = seedGenres?.split(',')[0] || 'pop';
+                const searchResponse = await fetch(
+                    `https://api.spotify.com/v1/search?q=genre:${fallbackGenre}&type=track&limit=${targetLimit}&market=FR`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    }
+                );
+
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    uniqueTracks.push(...(searchData.tracks?.items || []));
+                }
+            } catch (err) {
+                console.warn('[D3] Erreur recherche fallback:', err);
+            }
         }
 
-        // Erreur 400 : paramètres invalides
-        if (response.status === 400) {
-            const errorData = await response.json();
-            console.error('[D3] Paramètres invalides:', errorData);
-            return NextResponse.json(
-                {
-                    error: 'INVALID_PARAMS',
-                    message: 'Combinaison de paramètres invalide. Vérifiez vos semences et caractéristiques audio.'
-                },
-                { status: 400 }
-            );
-        }
-
-        // Erreur 404 : API Recommendations restreinte par Spotify (depuis Nov 2024)
-        if (response.status === 404) {
-            console.error('[D3] API Recommendations non accessible (restriction Spotify)');
-            return NextResponse.json(
-                {
-                    error: 'API_RESTRICTED',
-                    message: 'L\'API Spotify Recommendations n\'est plus accessible. Depuis novembre 2024, Spotify a restreint cet endpoint aux applications avec "Extended Quota Mode". Contactez Spotify Developer pour demander l\'accès étendu.'
-                },
-                { status: 403 }
-            );
-        }
-
-        if (!response.ok) {
-            console.error('[D3] Erreur Spotify recommendations:', response.status);
-            return NextResponse.json(
-                { error: 'SPOTIFY_ERROR', message: `Erreur Spotify (code ${response.status})` },
-                { status: response.status }
-            );
-        }
-
-        const data = await response.json();
+        const data = {
+            tracks: uniqueTracks.slice(0, Math.max(50, targetLimit * 2)), // On prend plus pour filtrer après
+            seeds: []
+        };
 
         // Récupère les IDs des tracks pour obtenir les audio features
         const trackIds = data.tracks.map((track: { id: string }) => track.id).join(',');
 
-        // Appel pour récupérer les audio features (pour l'energy score)
-        let audioFeatures: Record<string, number> = {};
+        // Appel pour récupérer les audio features (pour l'energy score ET le filtrage)
+        let audioFeatures: Record<string, { energy: number; danceability: number; valence: number }> = {};
 
         if (trackIds) {
             try {
@@ -154,10 +220,19 @@ export async function GET(request: NextRequest) {
 
                 if (featuresResponse.ok) {
                     const featuresData = await featuresResponse.json();
-                    // Crée un map id -> energy
-                    featuresData.audio_features?.forEach((feature: { id: string; energy: number } | null) => {
+                    // Crée un map id -> audio features
+                    featuresData.audio_features?.forEach((feature: { 
+                        id: string; 
+                        energy: number;
+                        danceability: number;
+                        valence: number;
+                    } | null) => {
                         if (feature) {
-                            audioFeatures[feature.id] = feature.energy;
+                            audioFeatures[feature.id] = {
+                                energy: feature.energy,
+                                danceability: feature.danceability,
+                                valence: feature.valence,
+                            };
                         }
                     });
                 }
@@ -167,8 +242,52 @@ export async function GET(request: NextRequest) {
             }
         }
 
+        // Filtre et trie les tracks selon les critères audio
+        let filteredTracks = data.tracks.filter((track: { id: string }) => {
+            const features = audioFeatures[track.id];
+            if (!features) return true; // Garde les tracks sans features
+
+            // Calcule la distance par rapport aux valeurs cibles
+            let distance = 0;
+            let criteriaCount = 0;
+
+            if (targetDanceability) {
+                const target = parseFloat(targetDanceability);
+                distance += Math.abs(features.danceability - target);
+                criteriaCount++;
+            }
+
+            if (targetEnergy) {
+                const target = parseFloat(targetEnergy);
+                distance += Math.abs(features.energy - target);
+                criteriaCount++;
+            }
+
+            if (targetValence) {
+                const target = parseFloat(targetValence);
+                distance += Math.abs(features.valence - target);
+                criteriaCount++;
+            }
+
+            // Accepte les tracks avec une distance moyenne < 0.3 (tolérance)
+            const avgDistance = criteriaCount > 0 ? distance / criteriaCount : 0;
+            return avgDistance < 0.3;
+        });
+
+        // Trie par popularité et pertinence
+        filteredTracks.sort((a: any, b: any) => {
+            const popA = a.popularity || 0;
+            const popB = b.popularity || 0;
+            return popB - popA;
+        });
+
+        // Limite au nombre demandé
+        filteredTracks = filteredTracks.slice(0, targetLimit);
+
+        console.log(`[D3] ${filteredTracks.length} tracks après filtrage sur ${data.tracks.length}`);
+
         // Transforme les données en format simplifié (D3)
-        const tracks: RecommendedTrack[] = data.tracks.map((track: {
+        const tracks: RecommendedTrack[] = filteredTracks.map((track: {
             id: string;
             name: string;
             artists?: Array<{ id: string; name: string }>;
@@ -188,18 +307,15 @@ export async function GET(request: NextRequest) {
             duration_ms: track.duration_ms || 0,
             previewUrl: track.preview_url || null,
             externalUrl: track.external_urls?.spotify || '',
-            energy: audioFeatures[track.id] ?? undefined,
+            energy: audioFeatures[track.id]?.energy ?? undefined,
         }));
 
         const result: RecommendationsResponse = {
             tracks,
-            seeds: data.seeds?.map((seed: { id: string; type: string }) => ({
-                id: seed.id,
-                type: seed.type,
-            })) || [],
+            seeds: [], // Pas de seeds dans la solution alternative
         };
 
-        console.log('[D3] Recommandations générées:', tracks.length, 'titres');
+        console.log('[D3] Recommandations générées (mode alternatif):', tracks.length, 'titres');
         return NextResponse.json(result);
     } catch (error) {
         console.error('[D3] Erreur fetch recommendations:', error);

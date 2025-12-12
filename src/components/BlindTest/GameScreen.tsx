@@ -116,13 +116,6 @@ export function GameScreen({
                 </div>
             )}
 
-            {/* Bouton de secours audio */}
-            <button
-                onClick={() => window.Spotify?.Player?.getInstance()?.resume()}
-                className="mt-4 text-xs text-zinc-500 hover:text-white underline"
-            >
-                Pas de son ? Cliquez ici pour activer le lecteur
-            </button>
         </div>
     );
 }
