@@ -1,20 +1,10 @@
 'use client';
 
-// Page d'accueil - Login Spotify
-// Redirige vers /dashboard si déjà connecté
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Headphones } from 'lucide-react';
-
-function SpotifyLogo({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-    </svg>
-  );
-}
+import { Music2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { isAuthenticated, isLoading, login } = useAuth();
@@ -30,33 +20,62 @@ export default function HomePage() {
   // Loader pendant la vérification
   if (isLoading || isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+      <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-700 border-t-green-500" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-8 sm:mb-12">
-        <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
-          <Headphones className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 text-green-500" />
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-            SpotyFusion
-          </h1>
-        </div>
-        <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-md mx-auto">
-          Statistiques, Blind Test et Playlists personnalisées
-        </p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      {/* Gradient de fond - du haut (vert) vers le bas (noir) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-green-900/30 via-green-950/10 to-black" />
+      
+      {/* Image de fond positionnée à droite */}
+      <div className="absolute top-0 right-0 w-1/2 h-2/3 opacity-40">
+        <Image
+          src="/fond.png"
+          alt="Background"
+          fill
+          className="object-cover object-center"
+          priority
+        />
       </div>
 
-      <button
-        onClick={login}
-        className="flex items-center gap-2 sm:gap-3 rounded-full bg-green-500 px-6 sm:px-8 py-3 sm:py-4 font-semibold text-white text-sm sm:text-base transition-transform hover:scale-105 hover:bg-green-400"
-      >
-        <SpotifyLogo className="h-5 w-5 sm:h-6 sm:w-6" />
-        Se connecter avec Spotify
-      </button>
+      {/* Card centrale avec contenu */}
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-zinc-800 p-8 sm:p-12 text-center shadow-2xl">
+          {/* Icône musicale verte */}
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+              <Music2 className="w-8 h-8 text-white" />
+            </div>
+          </div>
+
+          {/* Titre */}
+          <h1 className="text-4xl font-bold text-white mb-4">
+            SpotyFusion
+          </h1>
+
+          {/* Description */}
+          <p className="text-zinc-400 text-sm leading-relaxed mb-8 px-4">
+            Enrichissez votre expérience Spotify avec des statistiques détaillées, des blind tests et un générateur de playlists intelligent
+          </p>
+
+          {/* Bouton de connexion */}
+          <button
+            onClick={login}
+            className="w-full bg-green-500 hover:bg-green-400 text-white font-semibold py-3.5 px-6 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Se Connecter avec Spotify
+          </button>
+
+          {/* Note en bas */}
+          <p className="text-zinc-500 text-xs mt-6">
+            Vous serez redirigé vers Spotify pour autoriser l'accès
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

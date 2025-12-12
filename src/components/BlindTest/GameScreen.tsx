@@ -1,13 +1,10 @@
 'use client';
 
-// Écran de jeu principal (C2-C4)
-// Version SDK Spotify (dumb component)
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { AnswerButtons } from './AnswerButtons';
 import { BlindTestQuestion } from '@/hooks/useBlindTest';
-import { Music } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface GameScreenProps {
     question: BlindTestQuestion;
@@ -16,6 +13,7 @@ interface GameScreenProps {
     score: number;
     onAnswer: (index: number) => void;
     onNext: () => void;
+    onQuit?: () => void;
     isAnswered: boolean;
     lastAnswerCorrect: boolean | null;
 }
@@ -27,65 +25,125 @@ export function GameScreen({
     score,
     onAnswer,
     onNext,
+    onQuit,
     isAnswered,
     lastAnswerCorrect,
 }: GameScreenProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
+    const [timeLeft, setTimeLeft] = useState(15);
+    const [timerProgress, setTimerProgress] = useState(100);
 
     const handleAnswer = (index: number) => {
         setSelectedIndex(index);
         onAnswer(index);
     };
 
-    // Reset selectedIndex when question changes
+    const handleQuit = () => {
+        if (onQuit) {
+            onQuit();
+        }
+    };
+
     if (!isAnswered && selectedIndex !== undefined) {
         setSelectedIndex(undefined);
     }
 
+    useEffect(() => {
+        setTimeLeft(15);
+        setTimerProgress(100);
+    }, [questionNumber]);
+
+    useEffect(() => {
+        if (isAnswered) return;
+
+        const startTime = Date.now();
+        const duration = 15000;
+
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, duration - elapsed);
+            const seconds = Math.ceil(remaining / 1000);
+            const progress = (remaining / duration) * 100;
+
+            setTimeLeft(seconds);
+            setTimerProgress(progress);
+
+            if (remaining <= 0) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    onNext();
+                }, 500);
+            }
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, [questionNumber, isAnswered, onNext]);
+
+    const circumference = 2 * Math.PI * 60;
+    const strokeDashoffset = circumference - (timerProgress / 100) * circumference;
+
     return (
-        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-3xl mx-auto px-4">
-            {/* Header avec score et progression */}
-            <div className="w-full flex items-center justify-between">
-                <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-zinc-400 text-xs sm:text-sm">Question</span>
-                    <span className="text-white font-bold text-base sm:text-lg">
+        <div className="relative w-full">
+            <div className="w-full flex items-center justify-between mb-8">
+                <button 
+                    onClick={handleQuit}
+                    className="flex items-center justify-center transition-colors z-10"
+                >
+                    <X className="w-6 h-6 text-white hover:text-gray-400" />
+                </button>
+                
+                <h1 className="text-2xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                    Mellow Morning
+                </h1>
+                
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-sm"></div>
+                    <span className="text-white text-sm font-medium">
                         {questionNumber}/{totalQuestions}
                     </span>
                 </div>
+            </div>
 
-                <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-zinc-400 text-xs sm:text-sm">Score</span>
-                    <span className="text-green-400 font-bold text-base sm:text-lg">{score}</span>
+            <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
+            <div className="relative w-48 h-48 flex items-center justify-center">
+                <svg className="absolute w-full h-full -rotate-90">
+                    <circle
+                        cx="96"
+                        cy="96"
+                        r="60"
+                        stroke="#282828"
+                        strokeWidth="8"
+                        fill="none"
+                    />
+                    <circle
+                        cx="96"
+                        cy="96"
+                        r="60"
+                        stroke="#1db954"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        className="transition-all duration-100"
+                    />
+                </svg>
+                <div className="text-6xl font-bold text-white">
+                    {!isAnswered ? timeLeft : score}
                 </div>
             </div>
 
-            {/* Barre de progression */}
-            <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                    className="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
-                    style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
-                />
+            {!isAnswered && (
+                <div className="flex items-center gap-2 text-green-500 animate-pulse">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                    <span className="text-sm font-medium">En écoute...</span>
+                </div>
+            )}
+
+            <div className="bg-white text-black px-6 py-2 rounded-lg font-semibold text-lg">
+                {score} pts
             </div>
 
-            {/* Album cover */}
-            <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-xl overflow-hidden bg-zinc-800 shadow-2xl">
-                {isAnswered && question.track.albumImageUrl ? (
-                    <img
-                        src={question.track.albumImageUrl}
-                        alt="Album cover"
-                        className="w-full h-full object-cover animate-fade-in"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                        <Music className="w-16 h-16 sm:w-20 sm:h-20 text-zinc-600" />
-                    </div>
-                )}
-            </div>
-
-            {/* Audio player (Visual only) */}
-            <AudioPlayer isPlaying={!isAnswered} />
-
-            {/* Boutons de réponse */}
             <AnswerButtons
                 options={question.options}
                 correctIndex={question.correctIndex}
@@ -94,29 +152,15 @@ export function GameScreen({
                 selectedIndex={selectedIndex}
             />
 
-            {/* Feedback et bouton suivant */}
             {isAnswered && (
-                <div className="flex flex-col items-center gap-3 sm:gap-4 animate-fade-in w-full">
-                    <div className={`text-base sm:text-lg font-semibold ${lastAnswerCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                        {lastAnswerCorrect ? '✓ Correct !' : '✗ Mauvaise réponse'}
-                    </div>
-
-                    <div className="text-center">
-                        <p className="text-white font-medium text-sm sm:text-base">{question.track.name}</p>
-                        <p className="text-zinc-400 text-xs sm:text-sm">
-                            {question.track.artists.join(', ')}
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={onNext}
-                        className="mt-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-green-500 hover:bg-green-400 text-white text-sm sm:text-base font-semibold transition-all hover:scale-105"
-                    >
-                        {questionNumber === totalQuestions ? 'Voir le résultat' : 'Question suivante →'}
-                    </button>
-                </div>
+                <button
+                    onClick={onNext}
+                    className="mt-4 px-8 py-3 bg-white text-black rounded-full font-semibold text-base hover:scale-105 transition-transform"
+                >
+                    Question suivante
+                </button>
             )}
-
+            </div>
         </div>
     );
 }

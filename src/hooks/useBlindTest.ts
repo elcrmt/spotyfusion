@@ -170,13 +170,25 @@ export function useBlindTest() {
             // Lance la première musique
             if (questions.length > 0) {
                 const firstTrackUri = `spotify:track:${questions[0].track.id}`;
-                await playTrack(firstTrackUri);
+                console.log('[BlindTest] Lancement première track:', firstTrackUri);
+                
+                try {
+                    await playTrack(firstTrackUri);
+                    console.log('[BlindTest] ✅ Première track lancée');
+                } catch (error) {
+                    console.error('[BlindTest] ❌ Erreur lancement première track:', error);
+                    setState((s) => ({
+                        ...s,
+                        error: 'Impossible de lire la musique. Vérifiez que vous êtes Premium et que le lecteur est actif.'
+                    }));
+                }
 
-                // Arrête après 30s
+                // Arrête après 15s
                 if (timerRef.current) clearTimeout(timerRef.current);
                 timerRef.current = setTimeout(() => {
+                    console.log('[BlindTest] ⏱️ Timeout 15s atteint, pause');
                     pause();
-                }, 30000);
+                }, 15000);
             }
 
         } catch (error) {
@@ -187,19 +199,28 @@ export function useBlindTest() {
 
     // Soumet une réponse
     const submitAnswer = useCallback((selectedIndex: number) => {
+        console.log('[submitAnswer] Début - selectedIndex:', selectedIndex);
         pause(); // Stop music immediate
         if (timerRef.current) clearTimeout(timerRef.current);
 
         setState((s) => {
-            if (s.phase !== 'playing') return s;
+            console.log('[submitAnswer] État actuel:', { phase: s.phase, score: s.score, currentQuestionIndex: s.currentQuestionIndex });
+            
+            if (s.phase !== 'playing') {
+                console.warn('[submitAnswer] Phase incorrecte:', s.phase);
+                return s;
+            }
 
             const currentQuestion = s.questions[s.currentQuestionIndex];
             const isCorrect = selectedIndex === currentQuestion.correctIndex;
+            const newScore = isCorrect ? s.score + 10 : s.score;
+
+            console.log('[submitAnswer] Réponse:', { isCorrect, oldScore: s.score, newScore });
 
             return {
                 ...s,
                 phase: 'answered',
-                score: isCorrect ? s.score + 1 : s.score,
+                score: newScore,
                 lastAnswerCorrect: isCorrect,
             };
         });
@@ -214,16 +235,24 @@ export function useBlindTest() {
                 return { ...s, phase: 'finished' };
             }
 
-            // Lance la musique suivante (side effect, a bit dirty but works within hook logic for now)
+            // Lance la musique suivante
             setTimeout(async () => {
                 const nextTrack = s.questions[nextIndex].track;
                 const nextUri = `spotify:track:${nextTrack.id}`;
-                await playTrack(nextUri);
+                console.log('[BlindTest] Question suivante, lancement:', nextUri);
+                
+                try {
+                    await playTrack(nextUri);
+                    console.log('[BlindTest] ✅ Track suivante lancée');
+                } catch (error) {
+                    console.error('[BlindTest] ❌ Erreur lancement track suivante:', error);
+                }
 
                 if (timerRef.current) clearTimeout(timerRef.current);
                 timerRef.current = setTimeout(() => {
+                    console.log('[BlindTest] ⏱️ Timeout 15s atteint, pause');
                     pause();
-                }, 30000);
+                }, 15000);
             }, 0);
 
             return {

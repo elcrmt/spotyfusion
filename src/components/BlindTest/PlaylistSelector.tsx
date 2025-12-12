@@ -1,35 +1,55 @@
 'use client';
 
-// Composant de sélection de playlist (C1)
-
-import { PlaylistItem } from '@/lib/spotify/playlistClient';
-import { Music } from 'lucide-react';
+import { useState } from 'react';
+import Image from 'next/image';
+import { Play, Check } from 'lucide-react';
+import type { PlaylistItem } from '@/lib/spotify/playlistClient';
 
 interface PlaylistSelectorProps {
     playlists: PlaylistItem[];
     onSelect: (playlist: PlaylistItem) => void;
-    isLoading: boolean;
+    isLoading?: boolean;
 }
 
-export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSelectorProps) {
+export function PlaylistSelector({
+    playlists,
+    onSelect,
+    isLoading = false,
+}: PlaylistSelectorProps) {
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    const handleSelect = (playlist: PlaylistItem) => {
+        setSelectedId(playlist.id);
+    };
+
+    const handleStart = () => {
+        const selected = playlists.find(p => p.id === selectedId);
+        if (selected) {
+            onSelect(selected);
+        }
+    };
+
     if (isLoading) {
         return (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {[...Array(8)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="aspect-square rounded-xl bg-zinc-800 animate-pulse"
-                    />
-                ))}
+            <div>
+                <h2 className="text-lg font-bold text-white mb-4">Mes playlists</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                        <div key={i} className="animate-pulse">
+                            <div className="aspect-square bg-[#282828] rounded-lg mb-2" />
+                            <div className="h-4 bg-[#282828] rounded w-3/4" />
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
 
     if (playlists.length === 0) {
         return (
-            <div className="text-center py-8 sm:py-12 px-4">
-                <p className="text-zinc-400 text-sm sm:text-base">Aucune playlist trouvée</p>
-                <p className="text-zinc-500 text-xs sm:text-sm mt-2">
+            <div className="text-center py-12">
+                <p className="text-[#b3b3b3]">Aucune playlist trouvée</p>
+                <p className="text-[#6a6a6a] text-sm mt-1">
                     Créez des playlists sur Spotify pour jouer au Blind Test
                 </p>
             </div>
@@ -37,48 +57,61 @@ export function PlaylistSelector({ playlists, onSelect, isLoading }: PlaylistSel
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            {playlists.map((playlist) => (
-                <button
-                    key={playlist.id}
-                    onClick={() => onSelect(playlist)}
-                    className="group relative aspect-square rounded-xl overflow-hidden bg-zinc-800 hover:bg-zinc-700 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                    {playlist.imageUrl ? (
-                        <img
-                            src={playlist.imageUrl}
-                            alt={playlist.name}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                            <Music className="w-12 h-12 sm:w-16 sm:h-16 text-zinc-600" />
-                        </div>
-                    )}
+        <div>
+            <h2 className="text-lg font-bold text-white mb-4">Mes playlists</h2>
 
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4 mb-6">
+                {playlists.map((playlist) => {
+                    const isSelected = selectedId === playlist.id;
 
-                    {/* Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
-                        <h3 className="text-white font-semibold text-xs sm:text-sm truncate">
-                            {playlist.name}
-                        </h3>
-                        <p className="text-zinc-400 text-xs">
-                            {playlist.tracksCount} titres
-                        </p>
-                    </div>
+                    return (
+                        <button
+                            key={playlist.id}
+                            onClick={() => handleSelect(playlist)}
+                            className="text-left group"
+                        >
+                            <div className={`relative aspect-square rounded-lg overflow-hidden bg-[#282828] mb-2 ${isSelected ? 'ring-2 ring-green-500' : ''}`}>
+                                {playlist.imageUrl ? (
+                                    <Image
+                                        src={playlist.imageUrl}
+                                        alt={playlist.name}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform"
+                                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-3xl">
+                                        🎵
+                                    </div>
+                                )}
 
-                    {/* Play icon on hover */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
-                            <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                        </div>
-                    </div>
-                </button>
-            ))}
+                                {isSelected && (
+                                    <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                        <Check className="w-4 h-4 text-black" />
+                                    </div>
+                                )}
+
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+
+                            <p className="text-white text-sm font-medium truncate group-hover:text-green-400 transition-colors">
+                                {playlist.name}
+                            </p>
+                        </button>
+                    );
+                })}
+            </div>
+
+            <button
+                onClick={handleStart}
+                disabled={!selectedId}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+                <Play className="w-5 h-5" />
+                Commencer le Blind Test
+            </button>
         </div>
     );
 }
+
+export default PlaylistSelector;

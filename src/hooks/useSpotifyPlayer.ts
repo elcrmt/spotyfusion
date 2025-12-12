@@ -108,10 +108,15 @@ export function useSpotifyPlayer(accessToken: string) {
 
     // Fonction pour jouer une track
     const playTrack = useCallback(async (spotifyUri: string) => {
-        if (!deviceId || !accessToken) return;
+        if (!deviceId || !accessToken) {
+            console.warn('[playTrack] Pas de deviceId ou token', { deviceId, hasToken: !!accessToken });
+            return;
+        }
+
+        console.log('[playTrack] Lecture de:', spotifyUri, 'sur device:', deviceId);
 
         try {
-            await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+            const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
                 method: 'PUT',
                 body: JSON.stringify({ uris: [spotifyUri] }),
                 headers: {
@@ -119,9 +124,18 @@ export function useSpotifyPlayer(accessToken: string) {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('[playTrack] Erreur HTTP:', response.status, errorText);
+                throw new Error(`Erreur ${response.status}: ${errorText}`);
+            }
+            
+            console.log('[playTrack] ✅ Lecture démarrée avec succès');
             setIsPaused(false);
         } catch (e) {
-            console.error('[SDK] Erreur lecture:', e);
+            console.error('[playTrack] ❌ Erreur lecture:', e);
+            throw e;
         }
     }, [deviceId, accessToken]);
 

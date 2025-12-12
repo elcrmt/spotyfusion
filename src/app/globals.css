@@ -10,18 +10,28 @@
    CSS Custom Properties (Theme)
    ================================ */
 :root {
-  /* Colors - Dark theme by default (Spotify-like) */
-  --background: #09090b; /* zinc-950 */
-  --foreground: #fafafa; /* zinc-50 */
-  --muted: #27272a; /* zinc-800 */
-  --muted-foreground: #a1a1aa; /* zinc-400 */
-  --border: #27272a; /* zinc-800 */
-  --ring: #1db954; /* Spotify green */
+  /* Colors - Dark theme (Figma Maquette) */
+  --background: #000000;
+  /* Noir pur */
+  --background-card: #181818;
+  /* Cards gris foncé */
+  --background-elevated: #282828;
+  /* Éléments surélevés */
+  --foreground: #ffffff;
+  /* Texte blanc */
+  --muted: #1a1a1a;
+  /* Fond secondaire */
+  --muted-foreground: #b3b3b3;
+  /* Texte gris clair */
+  --border: #282828;
+  /* Bordures */
+  --ring: #1db954;
+  /* Spotify green */
 
   /* Spotify brand colors */
   --spotify-green: #1db954;
   --spotify-green-hover: #1ed760;
-  --spotify-black: #191414;
+  --spotify-black: #000000;
 }
 
 /* ================================
@@ -52,62 +62,86 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #18181b; /* zinc-900 */
+  background: #18181b;
+  /* zinc-900 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46; /* zinc-700 */
+  background: #3f3f46;
+  /* zinc-700 */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b; /* zinc-600 */
+  background: #52525b;
+  /* zinc-600 */
 }
 
 /* ================================
-   Custom Range Slider Styles
+   Custom Range Slider Styles - Figma
    ================================ */
 input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
+  width: 100%;
 }
 
 input[type='range']::-webkit-slider-runnable-track {
-  background: #3f3f46; /* zinc-700 */
-  height: 8px;
-  border-radius: 4px;
+  background: #404040;
+  height: 6px;
+  border-radius: 3px;
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  margin-top: -4px;
-  background-color: var(--spotify-green);
+  margin-top: -5px;
+  background-color: #fff;
   height: 16px;
   width: 16px;
   border-radius: 50%;
   transition: transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 input[type='range']::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  background-color: var(--spotify-green-hover);
 }
 
 input[type='range']::-moz-range-track {
-  background: #3f3f46;
-  height: 8px;
-  border-radius: 4px;
+  background: #404040;
+  height: 6px;
+  border-radius: 3px;
 }
 
 input[type='range']::-moz-range-thumb {
-  background-color: var(--spotify-green);
+  background-color: #fff;
   height: 16px;
   width: 16px;
   border-radius: 50%;
   border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Slider vert - pour les sliders avec classe slider-green */
+.slider-green::-webkit-slider-thumb {
+  background-color: #fff;
+}
+
+.slider-green::-moz-range-thumb {
+  background-color: #fff;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* ================================

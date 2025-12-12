@@ -1,7 +1,5 @@
 'use client';
 
-// Lecteur audio avec timer 30 secondes (C2)
-
 import { useEffect, useRef, useState } from 'react';
 import { Headphones } from 'lucide-react';
 
@@ -9,7 +7,7 @@ interface AudioPlayerProps {
     isPlaying: boolean;
 }
 
-const AUDIO_DURATION = 30; // secondes
+const AUDIO_DURATION = 30;
 
 export function AudioPlayer({ isPlaying }: AudioPlayerProps) {
     const [progress, setProgress] = useState(0);
@@ -21,7 +19,6 @@ export function AudioPlayer({ isPlaying }: AudioPlayerProps) {
 
         if (isPlaying) {
             startTime = Date.now();
-            // Reset si on redémarre
             setProgress(0);
             setRemainingTime(AUDIO_DURATION);
 
@@ -38,7 +35,6 @@ export function AudioPlayer({ isPlaying }: AudioPlayerProps) {
                 }
             }, 100);
         } else {
-            // Reset quand ça s'arrête
             setProgress(0);
             setRemainingTime(AUDIO_DURATION);
         }

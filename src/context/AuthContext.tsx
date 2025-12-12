@@ -1,7 +1,5 @@
 'use client';
 
-// Contexte d'authentification + profil utilisateur (A1 + A3)
-
 import {
   createContext,
   useContext,
@@ -19,8 +17,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   expiresAt: number | null;
-  user: SpotifyUserProfile | null; // A3
-  isLoadingUser: boolean; // A3
+  user: SpotifyUserProfile | null;
+  isLoadingUser: boolean;
   login: () => void;
   logout: () => void;
   refreshSession: () => Promise<void>;
@@ -36,10 +34,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
-  const [user, setUser] = useState<SpotifyUserProfile | null>(null); // A3
-  const [isLoadingUser, setIsLoadingUser] = useState(false); // A3
+  const [user, setUser] = useState<SpotifyUserProfile | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
 
-  // Récupère l'état de la session depuis le serveur
   const refreshSession = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/session');
@@ -55,14 +52,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  // Récupère le profil utilisateur Spotify (A3)
   const fetchUserProfile = useCallback(async () => {
     setIsLoadingUser(true);
     try {
       const profile = await fetchCurrentUserProfile();
       setUser(profile);
     } catch (error) {
-      console.error('[A3] Erreur profil:', error);
+      console.error('Erreur profil:', error);
       // Si 401 = session invalide, on appelle logout pour supprimer le cookie
       if (error instanceof Error && error.message === 'UNAUTHENTICATED') {
         setIsAuthenticated(false);
@@ -75,24 +71,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  // Vérifie la session au chargement
   useEffect(() => {
     refreshSession();
   }, [refreshSession]);
 
-  // Charge le profil quand l'utilisateur est authentifié (A3)
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       fetchUserProfile();
     }
   }, [isAuthenticated, isLoading, fetchUserProfile]);
 
-  // Redirige vers Spotify pour se connecter
   const login = useCallback(() => {
     window.location.href = '/api/auth/login';
   }, []);
 
-  // Déconnecte l'utilisateur
   const logout = useCallback(() => {
     setUser(null);
     window.location.href = '/api/auth/logout';
