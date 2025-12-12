@@ -126,12 +126,12 @@ input[type='range']::-moz-range-thumb {
 }
 
 /* Slider vert - pour les sliders avec classe slider-green */
-.slider-green::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #1db954 0%, #1db954 var(--value, 50%), #404040 var(--value, 50%), #404040 100%);
+.slider-green::-webkit-slider-thumb {
+  background-color: #fff;
 }
 
-.slider-green::-webkit-slider-thumb {
-  background-color: #1db954;
+.slider-green::-moz-range-thumb {
+  background-color: #fff;
 }
 
 /* Scrollbar hide utility */

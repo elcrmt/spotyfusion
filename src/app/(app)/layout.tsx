@@ -37,9 +37,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black p-2">
       <AppNavigation />
-      <main className="lg:ml-[220px] min-h-screen p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8">
+      {/* Zone de contenu principal avec fond gris et gap */}
+      <main className="lg:ml-[220px] min-h-screen bg-[#121212] rounded-lg p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 lg:ml-[228px]">
         {children}
       </main>
     </div>

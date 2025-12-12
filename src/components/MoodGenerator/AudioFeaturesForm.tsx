@@ -34,7 +34,6 @@ const sliderConfig = [
     description: 'À quel point le morceau est adapté à la danse',
     minLabel: 'Calme',
     maxLabel: 'Dansant',
-    color: 'bg-gradient-to-r from-purple-500 to-pink-500',
   },
   {
     key: 'energy' as const,
@@ -43,7 +42,6 @@ const sliderConfig = [
     description: 'Intensité et activité perçues',
     minLabel: 'Doux',
     maxLabel: 'Intense',
-    color: 'bg-gradient-to-r from-orange-500 to-red-500',
   },
   {
     key: 'valence' as const,
@@ -52,7 +50,6 @@ const sliderConfig = [
     description: 'Positivité musicale transmise',
     minLabel: 'Triste',
     maxLabel: 'Joyeux',
-    color: 'bg-gradient-to-r from-blue-500 to-green-500',
   },
 ];
 
@@ -94,66 +91,47 @@ export function AudioFeaturesForm({
   const fromSlider = (value: number) => value / 100;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {sliderConfig.map((config) => {
         const Icon = config.Icon;
         return (
-          <div key={config.key} className="space-y-3">
+          <div key={config.key} className="mb-6">
             {/* Label et valeur */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon className="w-5 h-5 text-green-500" />
-                <label className="text-base font-medium text-white">
-                  {config.label}
-                </label>
-              </div>
-              <span className="text-sm font-mono text-zinc-400 bg-zinc-800 px-2 py-1 rounded">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white font-medium">{config.label}</span>
+              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
                 {features[config.key].toFixed(2)}
               </span>
             </div>
 
+            {/* Slider avec style vert */}
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={toPercent(features[config.key])}
+              onChange={(e) =>
+                handleChange(config.key, fromSlider(Number(e.target.value)))
+              }
+              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
+              disabled={isLoading}
+              style={{
+                background: `linear-gradient(to right, #1db954 0%, #1db954 ${toPercent(features[config.key])}%, #404040 ${toPercent(features[config.key])}%, #404040 100%)`
+              }}
+            />
+
             {/* Description */}
-            <p className="text-xs text-zinc-500">{config.description}</p>
-
-            {/* Slider container */}
-            <div className="relative pt-1">
-              {/* Track background */}
-              <div className="h-2 bg-zinc-700 rounded-lg overflow-hidden">
-                {/* Barre de progression colorée */}
-                <div
-                  className={`h-full ${config.color} transition-all duration-200`}
-                  style={{ width: `${toPercent(features[config.key])}%` }}
-                />
-              </div>
-              {/* Slider (invisible mais fonctionnel) */}
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={toPercent(features[config.key])}
-                onChange={(e) =>
-                  handleChange(config.key, fromSlider(Number(e.target.value)))
-                }
-                className="absolute top-0 left-0 w-full h-2 opacity-0 cursor-pointer"
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Labels min/max */}
-            <div className="flex justify-between text-xs text-zinc-500">
-              <span>{config.minLabel}</span>
-              <span>{config.maxLabel}</span>
-            </div>
+            <p className="text-[#6a6a6a] text-xs mt-1">{config.description}</p>
           </div>
         );
       })}
 
-      {/* Bouton de soumission */}
+      {/* Bouton de soumission - Vert selon maquette */}
       {onSubmit && (
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-6 py-3 px-6 rounded-full bg-green-500 text-black font-semibold text-lg transition-all hover:bg-green-400 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="w-full mt-6 py-3 px-6 rounded-full bg-green-500 text-black font-semibold text-base transition-all hover:bg-green-400 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -162,8 +140,8 @@ export function AudioFeaturesForm({
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              <Music className="w-5 h-5" />
-              Générer ma playlist
+              <Sparkles className="w-5 h-5" />
+              Générer les recommandations
             </span>
           )}
         </button>

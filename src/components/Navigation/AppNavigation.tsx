@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { BarChart3, Music, ListMusic, Menu, X } from 'lucide-react';
+import { BarChart3, Music, ListMusic, Menu, X, LogOut } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Statistiques', icon: BarChart3 },
@@ -49,7 +49,7 @@ export function AppNavigation() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-screen w-[220px] flex flex-col bg-black z-40 transition-transform duration-300
+        fixed top-2 left-2 bottom-2 h-[calc(100vh-16px)] w-[220px] flex flex-col bg-[#121212] rounded-lg z-40 transition-transform duration-300
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
@@ -61,8 +61,8 @@ export function AppNavigation() {
           <span className="text-xl font-bold text-white">SpotyFusion</span>
         </div>
 
-        {/* User Profile Section - Figma Style */}
-        <div className="px-3 mb-4">
+        {/* User Profile Section - Figma Style avec bordures */}
+        <div className="px-3 mb-4 border-t border-b border-[#282828] py-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-[#1a1a1a]">
             {/* Avatar */}
             <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-[#282828]">
@@ -116,8 +116,8 @@ export function AppNavigation() {
                   <Link
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${isActive
-                        ? 'bg-[#1a1a1a] text-white'
+                    className={`relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                        ? 'bg-[#1a1a1a] text-white before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-green-500 before:rounded-l-md'
                         : 'text-[#b3b3b3] hover:text-white'
                       }`}
                   >
@@ -130,12 +130,13 @@ export function AppNavigation() {
           </ul>
         </nav>
 
-        {/* Logout Button */}
+        {/* Logout Button - Rouge avec icône */}
         <div className="px-3 py-4">
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-[#b3b3b3] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
           >
+            <LogOut className="w-4 h-4" />
             Déconnexion
           </button>
         </div>
