@@ -113,8 +113,14 @@ export interface SearchResult {
   tracks: SearchTrack[];
 }
 
-// Semence pour les recommandations (D2)
-export type Seed = SearchArtist | SearchTrack | { id: string; name: string; type: 'genre'; imageUrl: null };
+// Semence pour les recommandations (D2) - Interface flexible
+export interface Seed {
+  id: string;
+  name: string;
+  type: 'artist' | 'track' | 'genre';
+  imageUrl: string | null;
+  artists?: string[]; // Pour les tracks (optionnel)
+}
 
 // ================================
 // Types D3

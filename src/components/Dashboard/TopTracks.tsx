@@ -1,31 +1,25 @@
 'use client';
 
-// Composant TopTracks - Affiche les top 10 tracks de l'utilisateur (B1)
+// Composant TopTracks - Carousel horizontal avec images carrées - Maquette Figma
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   fetchTopTracks,
   TopTrack,
   TopTimeRange,
 } from '@/lib/spotify/spotifyClient';
-import { Music2, Disc3 } from 'lucide-react';
 
 interface TopTracksProps {
   timeRange?: TopTimeRange;
-}
-
-// Formate la durée en mm:ss
-function formatDuration(ms: number): string {
-  const minutes = Math.floor(ms / 60000);
-  const seconds = Math.floor((ms % 60000) / 1000);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   const [tracks, setTracks] = useState<TopTrack[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadTopTracks() {
@@ -45,23 +39,27 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
     loadTopTracks();
   }, [timeRange]);
 
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 200;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   // État de chargement
   if (isLoading) {
     return (
-      <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <Music2 className="w-5 h-5 text-green-500" />
-          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
-        </div>
-        <div className="space-y-2 sm:space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-2 sm:gap-4 animate-pulse">
-              <div className="h-6 w-6 sm:h-8 sm:w-8 rounded bg-zinc-700" />
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-zinc-700" />
-              <div className="flex-1">
-                <div className="h-3 sm:h-4 w-32 sm:w-40 bg-zinc-700 rounded mb-1 sm:mb-2" />
-                <div className="h-2 sm:h-3 w-20 sm:w-28 bg-zinc-800 rounded" />
-              </div>
+      <div>
+        <h2 className="text-xl font-bold text-white mb-4">Top 10 Morceaux</h2>
+        <div className="flex gap-4 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2 animate-pulse">
+              <div className="w-[140px] h-[140px] rounded-lg bg-[#282828]" />
+              <div className="h-4 w-28 bg-[#282828] rounded" />
+              <div className="h-3 w-20 bg-[#282828] rounded" />
             </div>
           ))}
         </div>
@@ -72,22 +70,10 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   // État d'erreur
   if (error) {
     return (
-      <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <Music2 className="w-5 h-5 text-green-500" />
-          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
-        </div>
-        <div className="text-center py-6 sm:py-8">
-          <p className="text-red-400 mb-2 text-sm sm:text-base">⚠️ {error}</p>
-          <p className="text-zinc-500 text-xs mb-3 sm:mb-4 px-4">
-            Vérifiez que votre compte est autorisé dans le Spotify Developer Dashboard.
-          </p>
-          <button
-            onClick={() => window.location.href = '/api/auth/logout'}
-            className="text-xs sm:text-sm text-zinc-400 hover:text-white transition-colors"
-          >
-            Se reconnecter
-          </button>
+      <div>
+        <h2 className="text-xl font-bold text-white mb-4">Top 10 Morceaux</h2>
+        <div className="bg-[#181818] rounded-lg p-6 text-center">
+          <p className="text-red-400">{error}</p>
         </div>
       </div>
     );
@@ -96,71 +82,80 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
   // Pas de données
   if (tracks.length === 0) {
     return (
-      <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <Music2 className="w-5 h-5 text-green-500" />
-          <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
+      <div>
+        <h2 className="text-xl font-bold text-white mb-4">Top 10 Morceaux</h2>
+        <div className="bg-[#181818] rounded-lg p-6 text-center">
+          <p className="text-[#b3b3b3]">Pas encore assez d&apos;écoutes</p>
         </div>
-        <p className="text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base px-4">
-          Pas encore assez d&apos;écoutes pour afficher vos top titres.
-        </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6">
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Music2 className="w-5 h-5 text-green-500" />
-        <h2 className="text-base sm:text-lg font-semibold text-white">Top 10 Titres</h2>
-      </div>
-      <ul className="space-y-2 sm:space-y-3">
+    <div className="relative group">
+      <h2 className="text-xl font-bold text-white mb-4">Top 10 Morceaux</h2>
+
+      {/* Bouton gauche */}
+      <button
+        onClick={() => scroll('left')}
+        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 mt-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20"
+        aria-label="Précédent"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+
+      {/* Carousel */}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {tracks.map((track, index) => (
-          <li key={track.id}>
-            <a
-              href={track.externalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 sm:gap-4 rounded-lg p-1.5 sm:p-2 -mx-1.5 sm:-mx-2 transition-colors hover:bg-zinc-800"
-            >
-              {/* Rang */}
-              <span className="w-5 sm:w-6 text-center text-xs sm:text-sm font-bold text-zinc-500">
-                {index + 1}
-              </span>
+          <a
+            key={track.id}
+            href={track.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 flex flex-col gap-2 group/item"
+          >
+            {/* Image carrée arrondie */}
+            <div className="relative w-[140px] h-[140px] rounded-lg overflow-hidden bg-[#282828] group-hover/item:ring-2 group-hover/item:ring-green-500 transition-all">
+              {track.albumImageUrl ? (
+                <Image
+                  src={track.albumImageUrl}
+                  alt={track.albumName}
+                  fill
+                  className="object-cover"
+                  sizes="140px"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-3xl">
+                  💿
+                </div>
+              )}
+            </div>
 
-              {/* Pochette album */}
-              <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 overflow-hidden rounded-lg bg-zinc-700">
-                {track.albumImageUrl ? (
-                  <Image
-                    src={track.albumImageUrl}
-                    alt={track.albumName}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 40px, 48px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-lg sm:text-xl">
-                    <Disc3 className="w-6 h-6 text-zinc-500" />
-                  </div>
-                )}
-              </div>
-
-              {/* Infos */}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-white truncate text-sm sm:text-base">{track.name}</p>
-                <p className="text-xs text-zinc-400 truncate">
-                  {track.artists.map((a) => a.name).join(', ')}
-                </p>
-              </div>
-
-              {/* Durée */}
-              <span className="text-xs text-zinc-500">
-                {formatDuration(track.duration_ms)}
-              </span>
-            </a>
-          </li>
+            {/* Rang + Titre + Artiste */}
+            <div className="max-w-[140px]">
+              <p className="text-white text-sm font-medium truncate">
+                #{index + 1}. {track.name}
+              </p>
+              <p className="text-[#b3b3b3] text-xs truncate">
+                {track.artists.map((a) => a.name).join(', ')}
+              </p>
+            </div>
+          </a>
         ))}
-      </ul>
+      </div>
+
+      {/* Bouton droite */}
+      <button
+        onClick={() => scroll('right')}
+        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 mt-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20"
+        aria-label="Suivant"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
     </div>
   );
 }

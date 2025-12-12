@@ -1,199 +1,321 @@
 'use client';
 
-// Page Mood Generator - Générateur de playlist selon l'humeur (D1, D2, D3)
+// Page Mood Generator - Maquette Figma - Générateur de Playlists
 
 import { useState, useCallback } from 'react';
+import { Sparkles, Info, X } from 'lucide-react';
 import {
-  AudioFeaturesForm,
-  SeedSelector,
   RecommendationsList,
-  type AudioFeatures,
 } from '@/components/MoodGenerator';
 import {
   fetchRecommendations,
   type Seed,
   type RecommendedTrack,
+  searchSpotify,
 } from '@/lib/spotify/spotifyClient';
-import { Palette } from 'lucide-react';
+
+// Genres populaires selon la maquette
+const POPULAR_GENRES = [
+  'Pop', 'Rock', 'Hip-Hop', 'Electronic', 'Jazz',
+  'Classical', 'R&B', 'Country'
+];
 
 export default function MoodGeneratorPage() {
-  // États D1/D2
-  const [currentFeatures, setCurrentFeatures] = useState<AudioFeatures>({
-    danceability: 0.5,
-    energy: 0.5,
-    valence: 0.5,
-  });
-  const [seeds, setSeeds] = useState<Seed[]>([]);
+  // États des sliders
+  const [danceability, setDanceability] = useState(0.5);
+  const [energy, setEnergy] = useState(0.5);
+  const [valence, setValence] = useState(0.5);
 
-  // États D3
+  // États des semences
+  const [seeds, setSeeds] = useState<Seed[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{ artists: any[]; tracks: any[] }>({ artists: [], tracks: [] });
+  const [isSearching, setIsSearching] = useState(false);
+
+  // États de génération
   const [recommendations, setRecommendations] = useState<RecommendedTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Gère le changement des sliders
-  const handleFeaturesChange = (features: AudioFeatures) => {
-    setCurrentFeatures(features);
+  // Recherche
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 2) {
+      setSearchResults({ artists: [], tracks: [] });
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const results = await searchSpotify(query, 'artist,track', 5);
+      setSearchResults(results);
+    } catch (err) {
+      console.error('Erreur recherche:', err);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
-  // Gère le changement des semences
-  const handleSeedsChange = (newSeeds: Seed[]) => {
-    setSeeds(newSeeds);
+  // Ajouter une semence (genre)
+  const addGenreSeed = (genre: string) => {
+    if (seeds.length >= 5) return;
+    if (seeds.find(s => s.id === genre.toLowerCase())) return;
+
+    setSeeds([...seeds, {
+      id: genre.toLowerCase(),
+      name: genre,
+      type: 'genre',
+      imageUrl: null,
+    }]);
   };
 
-  // Gère la soumission du formulaire - Génère les recommandations (D3)
-  const handleSubmit = useCallback(
-    async (features: AudioFeatures) => {
-      // Validation : au moins une seed requise
-      if (seeds.length === 0) {
-        setError('Veuillez sélectionner au moins une semence (artiste, titre ou genre).');
-        return;
+  // Ajouter une semence (artiste ou track)
+  const addSeed = (item: any, type: 'artist' | 'track') => {
+    if (seeds.length >= 5) return;
+    if (seeds.find(s => s.id === item.id)) return;
+
+    setSeeds([...seeds, {
+      id: item.id,
+      name: item.name,
+      type,
+      imageUrl: item.imageUrl,
+    }]);
+    setSearchQuery('');
+    setSearchResults({ artists: [], tracks: [] });
+  };
+
+  // Supprimer une semence
+  const removeSeed = (id: string) => {
+    setSeeds(seeds.filter(s => s.id !== id));
+  };
+
+  // Générer les recommandations
+  const handleGenerate = useCallback(async () => {
+    if (seeds.length === 0) {
+      setError('Veuillez sélectionner au moins une semence.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setRecommendations([]);
+
+    try {
+      const seedArtists = seeds.filter(s => s.type === 'artist').map(s => s.id);
+      const seedTracks = seeds.filter(s => s.type === 'track').map(s => s.id);
+      const seedGenres = seeds.filter(s => s.type === 'genre').map(s => s.id);
+
+      const result = await fetchRecommendations({
+        seedArtists: seedArtists.length > 0 ? seedArtists : undefined,
+        seedTracks: seedTracks.length > 0 ? seedTracks : undefined,
+        seedGenres: seedGenres.length > 0 ? seedGenres : undefined,
+        targetDanceability: danceability,
+        targetEnergy: energy,
+        targetValence: valence,
+        limit: 31,
+      });
+
+      setRecommendations(result.tracks);
+    } catch (err) {
+      console.error('Erreur génération:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Erreur lors de la génération.');
       }
-
-      setIsLoading(true);
-      setError(null);
-      setRecommendations([]);
-
-      try {
-        // Sépare les seeds par type
-        const seedArtists = seeds
-          .filter((s) => s.type === 'artist')
-          .map((s) => s.id);
-        const seedTracks = seeds
-          .filter((s) => s.type === 'track')
-          .map((s) => s.id);
-        const seedGenres = seeds
-          .filter((s) => s.type === 'genre')
-          .map((s) => s.id);
-
-        console.log('[D3] Génération avec:', {
-          seedArtists,
-          seedTracks,
-          seedGenres,
-          features,
-        });
-
-        // Appel API (D3)
-        const result = await fetchRecommendations({
-          seedArtists: seedArtists.length > 0 ? seedArtists : undefined,
-          seedTracks: seedTracks.length > 0 ? seedTracks : undefined,
-          seedGenres: seedGenres.length > 0 ? seedGenres : undefined,
-          targetDanceability: features.danceability,
-          targetEnergy: features.energy,
-          targetValence: features.valence,
-          limit: 30,
-        });
-
-        console.log('[D3] Recommandations reçues:', result.tracks.length, 'titres');
-        setRecommendations(result.tracks);
-      } catch (err) {
-        console.error('[D3] Erreur génération:', err);
-
-        // Gestion des erreurs
-        if (err instanceof Error) {
-          const errorCode = (err as Error & { code?: string }).code;
-
-          if (errorCode === 'INVALID_PARAMS') {
-            setError(err.message);
-          } else if (errorCode === 'API_RESTRICTED') {
-            setError(err.message);
-          } else if (err.message === 'UNAUTHENTICATED') {
-            setError('Session expirée. Veuillez vous reconnecter.');
-            // Redirection vers login après un délai
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 2000);
-          } else {
-            setError(err.message || 'Impossible de générer les recommandations. Veuillez réessayer.');
-          }
-        } else {
-          setError('Une erreur inattendue est survenue.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [seeds]
-  );
-
-  // Vérifie si le bouton peut être activé
-  const canGenerate = seeds.length > 0;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [seeds, danceability, energy, valence]);
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center gap-3 mb-6 sm:mb-8">
-        <Palette className="w-8 h-8 sm:w-10 sm:h-10 text-green-500" />
-        <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Mood Playlist</h1>
-          <p className="text-sm sm:text-base text-zinc-400">Générez une playlist selon votre humeur</p>
-        </div>
+    <div className="max-w-[1200px]">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+          Générateur de Playlists
+        </h1>
+        <p className="text-[#b3b3b3] text-sm">
+          Créez des playlists personnalisées basées sur vos préférences musicales
+        </p>
       </div>
 
-      <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-2">
-        {/* Panneau de configuration (gauche) */}
-        <div>
-          <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 text-center">
-                Ajustez l&apos;ambiance
-              </h2>
-              <p className="text-zinc-400 text-xs sm:text-sm text-center mb-6 sm:mb-8">
-                Personnalisez votre playlist avec les caractéristiques audio et des semences
-              </p>
-            </div>
+      {/* Main Grid - 2 colonnes */}
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
+        {/* Colonne Gauche - Caractéristiques Audio */}
+        <div className="bg-[#181818] rounded-xl p-6">
+          <h2 className="text-lg font-bold text-white mb-6">Caractéristiques Audio</h2>
 
-            {/* Sélecteur de semences (D2) */}
-            <div className="pb-6 sm:pb-8 border-b border-zinc-800">
-              <SeedSelector seeds={seeds} onSeedsChange={handleSeedsChange} maxSeeds={5} />
+          {/* Danceability Slider */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-white font-medium">Danceability</span>
+              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
+                {danceability.toFixed(2)}
+              </span>
             </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={danceability * 100}
+              onChange={(e) => setDanceability(Number(e.target.value) / 100)}
+              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
+            />
+            <p className="text-[#6a6a6a] text-xs mt-1">
+              À quel point la musique est adaptée à la danse
+            </p>
+          </div>
 
-            {/* Formulaire Audio Features (D1) */}
-            <AudioFeaturesForm
-              initialValues={currentFeatures}
-              onChange={handleFeaturesChange}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
+          {/* Energy Slider */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-white font-medium">Energy</span>
+              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
+                {energy.toFixed(2)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={energy * 100}
+              onChange={(e) => setEnergy(Number(e.target.value) / 100)}
+              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
+            />
+            <p className="text-[#6a6a6a] text-xs mt-1">
+              Intensité et activité de la musique
+            </p>
+          </div>
+
+          {/* Valence Slider */}
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-white font-medium">Valence (Positivité)</span>
+              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
+                {valence.toFixed(2)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={valence * 100}
+              onChange={(e) => setValence(Number(e.target.value) / 100)}
+              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
+            />
+            <p className="text-[#6a6a6a] text-xs mt-1">
+              Humeur positive ou négative de la musique
+            </p>
+          </div>
+        </div>
+
+        {/* Colonne Droite - Semences */}
+        <div className="bg-[#181818] rounded-xl p-6">
+          <h2 className="text-lg font-bold text-white mb-4">Semences</h2>
+
+          {/* Barre de recherche */}
+          <div className="relative mb-4">
+            <input
+              type="text"
+              placeholder="Rechercher artistes, pistes ou genres..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full bg-[#282828] text-white rounded-md px-4 py-3 text-sm placeholder-[#6a6a6a] focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
-            {/* Message si pas de seeds */}
-            {!canGenerate && (
-              <p className="text-center text-zinc-500 text-sm">
-                ☝️ Ajoutez au moins une semence pour générer des recommandations
-              </p>
+            {/* Résultats de recherche */}
+            {(searchResults.artists.length > 0 || searchResults.tracks.length > 0) && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#282828] rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto">
+                {searchResults.artists.map((artist) => (
+                  <button
+                    key={artist.id}
+                    onClick={() => addSeed(artist, 'artist')}
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[#333] text-left"
+                  >
+                    <span className="text-xs text-[#6a6a6a]">Artiste</span>
+                    <span className="text-white text-sm">{artist.name}</span>
+                  </button>
+                ))}
+                {searchResults.tracks.map((track) => (
+                  <button
+                    key={track.id}
+                    onClick={() => addSeed(track, 'track')}
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[#333] text-left"
+                  >
+                    <span className="text-xs text-[#6a6a6a]">Titre</span>
+                    <span className="text-white text-sm">{track.name}</span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Récapitulatif */}
-          {(seeds.length > 0 || currentFeatures) && (
-            <div className="mt-6 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6">
-              <h3 className="text-sm font-medium text-white mb-3">📋 Récapitulatif</h3>
-              <div className="space-y-2 text-xs text-zinc-400">
-                <p>
-                  <span className="text-zinc-500">Caractéristiques :</span> Danceability{' '}
-                  {currentFeatures.danceability.toFixed(2)} • Energy{' '}
-                  {currentFeatures.energy.toFixed(2)} • Valence{' '}
-                  {currentFeatures.valence.toFixed(2)}
-                </p>
-                {seeds.length > 0 && (
-                  <p>
-                    <span className="text-zinc-500">Semences :</span> {seeds.length} sélectionnée
-                    {seeds.length > 1 ? 's' : ''} (
-                    {seeds.map((s) => s.name).join(', ')})
-                  </p>
-                )}
+          {/* Genres populaires */}
+          <div className="mb-4">
+            <p className="text-[#b3b3b3] text-xs mb-2">Genres populaires :</p>
+            <div className="flex flex-wrap gap-2">
+              {POPULAR_GENRES.map((genre) => (
+                <button
+                  key={genre}
+                  onClick={() => addGenreSeed(genre)}
+                  disabled={seeds.length >= 5 || seeds.find(s => s.id === genre.toLowerCase()) !== undefined}
+                  className={`px-3 py-1 rounded-full text-sm border transition-colors ${seeds.find(s => s.id === genre.toLowerCase())
+                      ? 'bg-green-500 text-black border-green-500'
+                      : 'border-[#333] text-white hover:border-white disabled:opacity-50'
+                    }`}
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Semences sélectionnées */}
+          {seeds.length > 0 && (
+            <div className="mb-4">
+              <p className="text-[#b3b3b3] text-xs mb-2">Semences sélectionnées :</p>
+              <div className="flex flex-wrap gap-2">
+                {seeds.map((seed) => (
+                  <span
+                    key={seed.id}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-green-500 text-black"
+                  >
+                    {seed.name}
+                    <button onClick={() => removeSeed(seed.id)} className="hover:bg-green-600 rounded-full p-0.5">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
               </div>
             </div>
           )}
-        </div>
 
-        {/* Panneau des résultats (droite) - D3 */}
-        <div>
-          <RecommendationsList
-            tracks={recommendations}
-            isLoading={isLoading}
-            error={error}
-          />
+          {/* Info */}
+          <div className="flex items-start gap-2 text-[#6a6a6a] text-xs">
+            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <p>Ajoutez jusqu&apos;à 5 semences (artistes, pistes ou genres) pour personnaliser vos recommandations</p>
+          </div>
         </div>
       </div>
+
+      {/* Bouton Générer */}
+      <div className="mb-6">
+        <button
+          onClick={handleGenerate}
+          disabled={seeds.length === 0 || isLoading}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-black font-semibold rounded-full hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <Sparkles className="w-5 h-5" />
+          {isLoading ? 'Génération en cours...' : 'Générer les recommandations'}
+        </button>
+      </div>
+
+      {/* Section Recommandations */}
+      <RecommendationsList
+        tracks={recommendations}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   );
 }

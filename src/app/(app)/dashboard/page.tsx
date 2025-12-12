@@ -1,61 +1,63 @@
 'use client';
 
-// Page Dashboard - Statistiques d'écoute Spotify (B1, B3)
+// Page Dashboard - Statistiques d'écoute Spotify - Maquette Figma
 
 import { useState } from 'react';
 import { TopArtists, TopTracks, RecentlyPlayed } from '@/components/Dashboard';
 import type { TopTimeRange } from '@/lib/spotify/spotifyClient';
-import { BarChart3 } from 'lucide-react';
 
-// Labels pour les périodes
-const timeRangeLabels: Record<TopTimeRange, string> = {
-  short_term: '4 dernières semaines',
-  medium_term: '6 derniers mois',
-  long_term: 'Depuis toujours',
-};
+// Labels pour les périodes - Style Figma
+const timeRangeOptions: { value: TopTimeRange; label: string }[] = [
+  { value: 'short_term', label: '4 semaines' },
+  { value: 'medium_term', label: '6 mois' },
+  { value: 'long_term', label: 'Tout le temps' },
+];
 
 export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState<TopTimeRange>('medium_term');
+  const [timeRange, setTimeRange] = useState<TopTimeRange>('short_term');
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-        <div className="flex items-center gap-3">
-          <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-green-500" />
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Dashboard</h1>
-            <p className="text-sm sm:text-base text-zinc-400">Vos statistiques d&apos;écoute Spotify</p>
-          </div>
-        </div>
+    <div className="max-w-[1200px]">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+          Vos Statistiques
+        </h1>
+        <p className="text-[#b3b3b3] text-sm">
+          Découvrez vos artistes et morceaux préférés
+        </p>
+      </div>
 
-        {/* Sélecteur de période (B1) */}
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(timeRangeLabels) as TopTimeRange[]).map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-full transition-colors whitespace-nowrap ${
-                timeRange === range
-                  ? 'bg-green-500 text-black font-medium'
-                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+      {/* Filtres temporels - Style Figma */}
+      <div className="flex gap-2 mb-8">
+        {timeRangeOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setTimeRange(option.value)}
+            className={`px-4 py-2 text-sm rounded-full transition-all ${timeRange === option.value
+                ? 'bg-green-500 text-black font-semibold'
+                : 'bg-transparent text-white border border-[#333] hover:border-white'
               }`}
-            >
-              {timeRangeLabels[range]}
-            </button>
-          ))}
-        </div>
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
 
-      {/* Top 10 Artistes et Top 10 Titres (B1) */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+      {/* Top 10 Artistes - Carousel horizontal */}
+      <section className="mb-8">
         <TopArtists timeRange={timeRange} />
-        <TopTracks timeRange={timeRange} />
-      </div>
+      </section>
 
-      {/* Récemment écouté (B3) */}
-      <div className="mt-4 sm:mt-6">
+      {/* Top 10 Morceaux - Carousel horizontal */}
+      <section className="mb-8">
+        <TopTracks timeRange={timeRange} />
+      </section>
+
+      {/* 5 Derniers Titres Écoutés */}
+      <section>
         <RecentlyPlayed />
-      </div>
+      </section>
     </div>
   );
 }

@@ -150,7 +150,7 @@ export function SeedSelector({
               {/* Nom */}
               <span className="text-sm text-white truncate max-w-[150px]">
                 {seed.name}
-                {seed.type === 'track' && 'artists' in seed && seed.artists.length > 0 && (
+                {seed.type === 'track' && seed.artists && seed.artists.length > 0 && (
                   <span className="text-zinc-500 ml-1">• {seed.artists[0]}</span>
                 )}
               </span>
@@ -231,7 +231,7 @@ export function SeedSelector({
                   </p>
                   <p className="text-xs text-zinc-400">
                     {result.type === 'artist' && 'Artiste'}
-                    {result.type === 'track' && 'artists' in result && result.artists.join(', ')}
+                    {result.type === 'track' && result.artists && result.artists.join(', ')}
                   </p>
                 </div>
 
