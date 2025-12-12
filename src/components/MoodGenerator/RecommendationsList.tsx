@@ -51,10 +51,9 @@ export function RecommendationsList({
                 <h2 className="text-lg font-bold text-white text-center mb-8">Recommandations</h2>
 
                 {/* Contenu centré */}
-                <div className="flex flex-col items-center justify-center py-12">
-                    {/* Icône note de musique - Figma PNG */}
+                <div className="flex flex-col items-center justify-center py-10">
                     <Image
-                        src="/icons/music-note.png"
+                        src="/ss.png"
                         alt="Note de musique"
                         width={64}
                         height={64}
