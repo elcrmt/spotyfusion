@@ -1,7 +1,5 @@
 'use client';
 
-// Page Mood Generator - Maquette Figma - Générateur de Playlists
-
 import { useState, useCallback } from 'react';
 import { Sparkles, Info, X } from 'lucide-react';
 import {
@@ -15,30 +13,25 @@ import {
   searchSpotify,
 } from '@/lib/spotify/spotifyClient';
 
-// Genres populaires selon la maquette
 const POPULAR_GENRES = [
   'Pop', 'Rock', 'Hip-Hop', 'Electronic', 'Jazz',
   'Classical', 'R&B', 'Country'
 ];
 
 export default function MoodGeneratorPage() {
-  // États des sliders
   const [danceability, setDanceability] = useState(0.5);
   const [energy, setEnergy] = useState(0.5);
   const [valence, setValence] = useState(0.5);
 
-  // États des semences
   const [seeds, setSeeds] = useState<Seed[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{ artists: any[]; tracks: any[] }>({ artists: [], tracks: [] });
   const [isSearching, setIsSearching] = useState(false);
 
-  // États de génération
   const [recommendations, setRecommendations] = useState<RecommendedTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Recherche
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (query.length < 2) {
@@ -56,7 +49,6 @@ export default function MoodGeneratorPage() {
     }
   };
 
-  // Ajouter une semence (genre)
   const addGenreSeed = (genre: string) => {
     if (seeds.length >= 5) return;
     if (seeds.find(s => s.id === genre.toLowerCase())) return;
@@ -69,7 +61,6 @@ export default function MoodGeneratorPage() {
     }]);
   };
 
-  // Ajouter une semence (artiste ou track)
   const addSeed = (item: any, type: 'artist' | 'track') => {
     if (seeds.length >= 5) return;
     if (seeds.find(s => s.id === item.id)) return;
@@ -84,12 +75,10 @@ export default function MoodGeneratorPage() {
     setSearchResults({ artists: [], tracks: [] });
   };
 
-  // Supprimer une semence
   const removeSeed = (id: string) => {
     setSeeds(seeds.filter(s => s.id !== id));
   };
 
-  // Générer les recommandations
   const handleGenerate = useCallback(async () => {
     if (seeds.length === 0) {
       setError('Veuillez sélectionner au moins une semence.');

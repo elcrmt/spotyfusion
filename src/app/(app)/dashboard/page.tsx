@@ -1,12 +1,9 @@
 'use client';
 
-// Page Dashboard - Statistiques d'écoute Spotify - Maquette Figma
-
 import { useState } from 'react';
 import { TopArtists, TopTracks, RecentlyPlayed } from '@/components/Dashboard';
 import type { TopTimeRange } from '@/lib/spotify/spotifyClient';
 
-// Labels pour les périodes - Style Figma
 const timeRangeOptions: { value: TopTimeRange; label: string }[] = [
   { value: 'short_term', label: '4 semaines' },
   { value: 'medium_term', label: '6 mois' },

@@ -199,19 +199,28 @@ export function useBlindTest() {
 
     // Soumet une réponse
     const submitAnswer = useCallback((selectedIndex: number) => {
+        console.log('[submitAnswer] Début - selectedIndex:', selectedIndex);
         pause(); // Stop music immediate
         if (timerRef.current) clearTimeout(timerRef.current);
 
         setState((s) => {
-            if (s.phase !== 'playing') return s;
+            console.log('[submitAnswer] État actuel:', { phase: s.phase, score: s.score, currentQuestionIndex: s.currentQuestionIndex });
+            
+            if (s.phase !== 'playing') {
+                console.warn('[submitAnswer] Phase incorrecte:', s.phase);
+                return s;
+            }
 
             const currentQuestion = s.questions[s.currentQuestionIndex];
             const isCorrect = selectedIndex === currentQuestion.correctIndex;
+            const newScore = isCorrect ? s.score + 10 : s.score;
+
+            console.log('[submitAnswer] Réponse:', { isCorrect, oldScore: s.score, newScore });
 
             return {
                 ...s,
                 phase: 'answered',
-                score: isCorrect ? s.score + 10 : s.score, // +10 points par bonne réponse
+                score: newScore,
                 lastAnswerCorrect: isCorrect,
             };
         });

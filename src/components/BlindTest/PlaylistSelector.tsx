@@ -1,7 +1,5 @@
 'use client';
 
-// Composant PlaylistSelector - Grille de playlists - Maquette Figma
-
 import { useState } from 'react';
 import Image from 'next/image';
 import { Play, Check } from 'lucide-react';
@@ -31,7 +29,6 @@ export function PlaylistSelector({
         }
     };
 
-    // État de chargement
     if (isLoading) {
         return (
             <div>
@@ -48,7 +45,6 @@ export function PlaylistSelector({
         );
     }
 
-    // Pas de playlists
     if (playlists.length === 0) {
         return (
             <div className="text-center py-12">
@@ -64,7 +60,6 @@ export function PlaylistSelector({
         <div>
             <h2 className="text-lg font-bold text-white mb-4">Mes playlists</h2>
 
-            {/* Grille de playlists */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4 mb-6">
                 {playlists.map((playlist) => {
                     const isSelected = selectedId === playlist.id;
@@ -75,9 +70,7 @@ export function PlaylistSelector({
                             onClick={() => handleSelect(playlist)}
                             className="text-left group"
                         >
-                            {/* Image */}
-                            <div className={`relative aspect-square rounded-lg overflow-hidden bg-[#282828] mb-2 ${isSelected ? 'ring-2 ring-green-500' : ''
-                                }`}>
+                            <div className={`relative aspect-square rounded-lg overflow-hidden bg-[#282828] mb-2 ${isSelected ? 'ring-2 ring-green-500' : ''}`}>
                                 {playlist.imageUrl ? (
                                     <Image
                                         src={playlist.imageUrl}
@@ -92,18 +85,15 @@ export function PlaylistSelector({
                                     </div>
                                 )}
 
-                                {/* Checkmark si sélectionné */}
                                 {isSelected && (
                                     <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                         <Check className="w-4 h-4 text-black" />
                                     </div>
                                 )}
 
-                                {/* Overlay au hover */}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
 
-                            {/* Nom */}
                             <p className="text-white text-sm font-medium truncate group-hover:text-green-400 transition-colors">
                                 {playlist.name}
                             </p>
@@ -112,11 +102,10 @@ export function PlaylistSelector({
                 })}
             </div>
 
-            {/* Bouton Commencer */}
             <button
                 onClick={handleStart}
                 disabled={!selectedId}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-black font-semibold rounded-full hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
                 <Play className="w-5 h-5" />
                 Commencer le Blind Test

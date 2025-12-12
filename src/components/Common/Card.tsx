@@ -25,10 +25,6 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
-// ================================
-// Styles
-// ================================
-
 const baseStyles =
   'bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden';
 

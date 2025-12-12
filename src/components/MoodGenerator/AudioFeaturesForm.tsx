@@ -1,18 +1,12 @@
 'use client';
 
-// Composant AudioFeaturesForm - Formulaire pour ajuster les caractéristiques audio (D1)
-
 import { useState, useCallback } from 'react';
 import { PartyPopper, Zap, Smile, Sparkles, Music } from 'lucide-react';
 
-// ================================
-// Types D1
-// ================================
-
 export interface AudioFeatures {
-  danceability: number; // 0.0 à 1.0
-  energy: number; // 0.0 à 1.0
-  valence: number; // 0.0 à 1.0 (positivité/humeur)
+  danceability: number;
+  energy: number;
+  valence: number;
 }
 
 interface AudioFeaturesFormProps {
@@ -21,10 +15,6 @@ interface AudioFeaturesFormProps {
   onSubmit?: (features: AudioFeatures) => void;
   isLoading?: boolean;
 }
-
-// ================================
-// Configuration des sliders
-// ================================
 
 const sliderConfig = [
   {
@@ -53,10 +43,6 @@ const sliderConfig = [
   },
 ];
 
-// ================================
-// Composant
-// ================================
-
 export function AudioFeaturesForm({
   initialValues = { danceability: 0.5, energy: 0.5, valence: 0.5 },
   onChange,
@@ -65,7 +51,6 @@ export function AudioFeaturesForm({
 }: AudioFeaturesFormProps) {
   const [features, setFeatures] = useState<AudioFeatures>(initialValues);
 
-  // Met à jour une caractéristique
   const handleChange = useCallback(
     (key: keyof AudioFeatures, value: number) => {
       const newFeatures = { ...features, [key]: value };
@@ -75,7 +60,6 @@ export function AudioFeaturesForm({
     [features, onChange]
   );
 
-  // Soumet le formulaire
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -84,10 +68,7 @@ export function AudioFeaturesForm({
     [features, onSubmit]
   );
 
-  // Convertit la valeur 0-1 en pourcentage pour l'affichage
   const toPercent = (value: number) => Math.round(value * 100);
-
-  // Convertit la valeur du slider (0-100) en 0.0-1.0
   const fromSlider = (value: number) => value / 100;
 
   return (

@@ -1,8 +1,5 @@
 'use client';
 
-// Layout pour les pages authentifiées (dashboard, blind-test, mood-generator)
-// Affiche la navigation et redirige vers / si non connecté
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -12,14 +9,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  // Redirige vers la page de login si non authentifié
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace('/');
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Affiche un loader pendant la vérification
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -31,7 +26,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Ne rien afficher si non authentifié (redirection en cours)
   if (!isAuthenticated) {
     return null;
   }

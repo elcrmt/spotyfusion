@@ -1,7 +1,5 @@
 'use client';
 
-// Page Blind Test - Maquette Figma - Quiz musical
-
 import { useEffect } from 'react';
 import { useBlindTest } from '@/hooks/useBlindTest';
 import { PlaylistSelector, GameScreen, EndScreen } from '@/components/BlindTest';
@@ -24,26 +22,25 @@ export default function BlindTestPage() {
     restart,
   } = useBlindTest();
 
-  // Charge les playlists au montage
   useEffect(() => {
     loadPlaylists();
   }, [loadPlaylists]);
 
   return (
     <div className="max-w-[1200px]">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
-          Blind Test Musical
-        </h1>
-        <p className="text-[#b3b3b3] text-sm">
-          {phase === 'select' && 'Testez vos connaissances musicales en devinant les morceaux'}
-          {phase === 'playing' && selectedPlaylist?.name}
-          {phase === 'answered' && selectedPlaylist?.name}
-          {phase === 'finished' && 'Partie terminée !'}
-          {phase === 'loading' && 'Chargement...'}
-        </p>
-      </div>
+      {/* Header uniquement pour les phases autres que playing/answered */}
+      {phase !== 'playing' && phase !== 'answered' && (
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+            Blind Test Musical
+          </h1>
+          <p className="text-[#b3b3b3] text-sm">
+            {phase === 'select' && 'Testez vos connaissances musicales en devinant les morceaux'}
+            {phase === 'finished' && 'Partie terminée !'}
+            {phase === 'loading' && 'Chargement...'}
+          </p>
+        </div>
+      )}
 
       {/* Message d'erreur */}
       {error && (

@@ -1,7 +1,5 @@
 'use client';
 
-// Écran de fin de jeu (C5)
-
 import { Trophy, Star, ThumbsUp, Headphones, Dumbbell, RotateCcw } from 'lucide-react';
 
 interface EndScreenProps {
@@ -11,7 +9,6 @@ interface EndScreenProps {
 }
 
 export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) {
-    // Le score est maintenant sur 100 points (10 points par question)
     const maxScore = totalQuestions * 10;
     const percentage = Math.round((score / maxScore) * 100);
     const correctAnswers = Math.floor(score / 10);

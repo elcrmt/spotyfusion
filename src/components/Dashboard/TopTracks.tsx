@@ -1,7 +1,5 @@
 'use client';
 
-// Composant TopTracks - Carousel horizontal avec images carrées - Maquette Figma
-
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -49,7 +47,6 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
     }
   };
 
-  // État de chargement
   if (isLoading) {
     return (
       <div>
@@ -67,7 +64,6 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
     );
   }
 
-  // État d'erreur
   if (error) {
     return (
       <div>
@@ -79,7 +75,6 @@ export function TopTracks({ timeRange = 'medium_term' }: TopTracksProps) {
     );
   }
 
-  // Pas de données
   if (tracks.length === 0) {
     return (
       <div>

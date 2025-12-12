@@ -1,9 +1,7 @@
 'use client';
 
-// Composant GreenSlider - Slider avec barre verte progressive - Maquette Figma
-
 interface GreenSliderProps {
-    value: number; // 0-1
+    value: number;
     onChange: (value: number) => void;
     label: string;
     description: string;

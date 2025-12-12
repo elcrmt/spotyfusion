@@ -1,7 +1,5 @@
 'use client';
 
-// Composant RecommendationsList - Maquette Figma
-
 import Image from 'next/image';
 import { Save, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import type { RecommendedTrack } from '@/lib/spotify/spotifyClient';
@@ -12,7 +10,6 @@ interface RecommendationsListProps {
     error?: string | null;
 }
 
-// Formate la durée en mm:ss
 function formatDuration(ms: number): string {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -24,7 +21,6 @@ export function RecommendationsList({
     isLoading = false,
     error = null,
 }: RecommendationsListProps) {
-    // État de chargement
     if (isLoading) {
         return (
             <div className="bg-[#181818] rounded-xl p-6">
@@ -36,7 +32,6 @@ export function RecommendationsList({
         );
     }
 
-    // État d'erreur
     if (error) {
         return (
             <div className="bg-[#181818] rounded-xl p-6">
@@ -49,7 +44,6 @@ export function RecommendationsList({
         );
     }
 
-    // Pas de données
     if (tracks.length === 0) {
         return (
             <div className="bg-[#181818] rounded-xl p-6">
@@ -83,7 +77,7 @@ export function RecommendationsList({
             <div className="space-y-1">
                 {tracks.map((track, index) => (
                     <a
-                        key={track.id}
+                        key={`${track.id}-${index}`}
                         href={track.externalUrl}
                         target="_blank"
                         rel="noopener noreferrer"

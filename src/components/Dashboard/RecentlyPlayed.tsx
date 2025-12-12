@@ -1,7 +1,5 @@
 'use client';
 
-// Composant RecentlyPlayed - Liste horizontale avec image grande - Maquette Figma
-
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
@@ -10,7 +8,6 @@ import {
   RecentTrack,
 } from '@/lib/spotify/spotifyClient';
 
-// Formate l'horodatage en format lisible
 function formatPlayedAt(isoString: string): string {
   const date = new Date(isoString);
   const now = new Date();
@@ -53,7 +50,6 @@ export function RecentlyPlayed() {
     loadRecentlyPlayed();
   }, []);
 
-  // État de chargement
   if (isLoading) {
     return (
       <div>
@@ -72,7 +68,6 @@ export function RecentlyPlayed() {
     );
   }
 
-  // État d'erreur
   if (error) {
     return (
       <div>
@@ -84,7 +79,6 @@ export function RecentlyPlayed() {
     );
   }
 
-  // Pas de données
   if (tracks.length === 0) {
     return (
       <div>

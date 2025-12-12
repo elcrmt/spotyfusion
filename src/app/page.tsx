@@ -1,8 +1,5 @@
 'use client';
 
-// Page d'accueil - Login Spotify
-// Redirige vers /dashboard si déjà connecté
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';

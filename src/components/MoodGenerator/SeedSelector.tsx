@@ -1,7 +1,5 @@
 'use client';
 
-// Composant SeedSelector - Sélection de semences avec recherche (D2)
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { searchSpotify, type Seed } from '@/lib/spotify/spotifyClient';
@@ -24,7 +22,6 @@ export function SeedSelector({
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Recherche avec debounce
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([]);
@@ -43,7 +40,7 @@ export function SeedSelector({
         setResults(allResults);
         setShowResults(true);
       } catch (error) {
-        console.error('[D2] Erreur recherche:', error);
+        console.error('Erreur recherche:', error);
         setResults([]);
       } finally {
         setIsSearching(false);
@@ -53,7 +50,6 @@ export function SeedSelector({
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  // Ferme les résultats en cliquant ailleurs
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -70,15 +66,12 @@ export function SeedSelector({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Ajoute une semence
   const addSeed = useCallback(
     (seed: Seed) => {
-      // Vérifie le maximum
       if (seeds.length >= maxSeeds) {
         return;
       }
 
-      // Vérifie si déjà ajouté
       if (seeds.some((s) => s.id === seed.id && s.type === seed.type)) {
         return;
       }
@@ -91,7 +84,6 @@ export function SeedSelector({
     [seeds, maxSeeds, onSeedsChange]
   );
 
-  // Retire une semence
   const removeSeed = useCallback(
     (seedId: string, seedType: string) => {
       onSeedsChange(seeds.filter((s) => !(s.id === seedId && s.type === seedType)));
@@ -99,7 +91,6 @@ export function SeedSelector({
     [seeds, onSeedsChange]
   );
 
-  // Gère la touche Enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && results.length > 0) {
       e.preventDefault();

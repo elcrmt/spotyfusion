@@ -1,7 +1,5 @@
 'use client';
 
-// Écran de jeu principal - Design maquette Figma
-
 import { useState, useEffect } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { AnswerButtons } from './AnswerButtons';
@@ -32,8 +30,8 @@ export function GameScreen({
     lastAnswerCorrect,
 }: GameScreenProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
-    const [timeLeft, setTimeLeft] = useState(15); // Timer de 15 secondes
-    const [timerProgress, setTimerProgress] = useState(100); // Pourcentage du timer
+    const [timeLeft, setTimeLeft] = useState(15);
+    const [timerProgress, setTimerProgress] = useState(100);
 
     const handleAnswer = (index: number) => {
         setSelectedIndex(index);
@@ -46,23 +44,20 @@ export function GameScreen({
         }
     };
 
-    // Reset selectedIndex when question changes
     if (!isAnswered && selectedIndex !== undefined) {
         setSelectedIndex(undefined);
     }
 
-    // Timer de 15 secondes - Reset au changement de question
     useEffect(() => {
         setTimeLeft(15);
         setTimerProgress(100);
     }, [questionNumber]);
 
-    // Gestion du timer (décompte uniquement si non répondu)
     useEffect(() => {
         if (isAnswered) return;
 
         const startTime = Date.now();
-        const duration = 15000; // 15 secondes en ms
+        const duration = 15000;
 
         const interval = setInterval(() => {
             const elapsed = Date.now() - startTime;
@@ -75,7 +70,6 @@ export function GameScreen({
 
             if (remaining <= 0) {
                 clearInterval(interval);
-                // Timeout : on passe automatiquement à la question suivante sans points
                 setTimeout(() => {
                     onNext();
                 }, 500);
@@ -85,38 +79,34 @@ export function GameScreen({
         return () => clearInterval(interval);
     }, [questionNumber, isAnswered, onNext]);
 
-    // Calcul pour le cercle du timer
-    const circumference = 2 * Math.PI * 60; // rayon = 60
+    const circumference = 2 * Math.PI * 60;
     const strokeDashoffset = circumference - (timerProgress / 100) * circumference;
 
     return (
-        <div className="relative flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
-            {/* Header avec bouton fermer à gauche, titre au centre et compteur à droite */}
-            <div className="w-full flex items-center justify-between mb-4 relative">
-                {/* Bouton fermer à gauche */}
+        <div className="relative w-full">
+            <div className="w-full flex items-center justify-between mb-8">
                 <button 
                     onClick={handleQuit}
-                    className="w-10 h-10 rounded-full bg-[#1a1a1a] hover:bg-[#282828] flex items-center justify-center transition-colors z-10"
+                    className="flex items-center justify-center transition-colors z-10"
                 >
-                    <X className="w-5 h-5 text-white" />
+                    <X className="w-6 h-6 text-white hover:text-gray-400" />
                 </button>
                 
-                {/* Titre au centre (absolu pour être vraiment centré) */}
-                <h1 className="text-xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                <h1 className="text-2xl font-bold text-white absolute left-1/2 -translate-x-1/2">
                     Mellow Morning
                 </h1>
                 
-                {/* Compteur à droite */}
-                <div className="text-white text-sm font-medium">
-                    {questionNumber}/{totalQuestions}
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-sm"></div>
+                    <span className="text-white text-sm font-medium">
+                        {questionNumber}/{totalQuestions}
+                    </span>
                 </div>
             </div>
 
-            {/* Cercle de timer avec temps restant */}
+            <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
             <div className="relative w-48 h-48 flex items-center justify-center">
-                {/* Cercle SVG */}
                 <svg className="absolute w-full h-full -rotate-90">
-                    {/* Cercle de fond */}
                     <circle
                         cx="96"
                         cy="96"
@@ -125,7 +115,6 @@ export function GameScreen({
                         strokeWidth="8"
                         fill="none"
                     />
-                    {/* Cercle de timer vert */}
                     <circle
                         cx="96"
                         cy="96"
@@ -139,13 +128,11 @@ export function GameScreen({
                         className="transition-all duration-100"
                     />
                 </svg>
-                {/* Temps restant ou score au centre */}
                 <div className="text-6xl font-bold text-white">
                     {!isAnswered ? timeLeft : score}
                 </div>
             </div>
 
-            {/* Indicateur de lecture audio */}
             {!isAnswered && (
                 <div className="flex items-center gap-2 text-green-500 animate-pulse">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
@@ -153,12 +140,10 @@ export function GameScreen({
                 </div>
             )}
 
-            {/* Badge avec points gagnés ou nom de la chanson */}
             <div className="bg-white text-black px-6 py-2 rounded-lg font-semibold text-lg">
-                {!isAnswered ? '10 pts' : question.track.name}
+                {score} pts
             </div>
 
-            {/* Boutons de réponse */}
             <AnswerButtons
                 options={question.options}
                 correctIndex={question.correctIndex}
@@ -167,7 +152,6 @@ export function GameScreen({
                 selectedIndex={selectedIndex}
             />
 
-            {/* Bouton suivant (visible uniquement après avoir répondu) */}
             {isAnswered && (
                 <button
                     onClick={onNext}
@@ -176,6 +160,7 @@ export function GameScreen({
                     Question suivante
                 </button>
             )}
+            </div>
         </div>
     );
 }

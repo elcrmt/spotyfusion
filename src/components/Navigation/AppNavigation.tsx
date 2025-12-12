@@ -1,7 +1,5 @@
 'use client';
 
-// Navigation principale avec profil utilisateur Spotify - Maquette Figma
-
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';

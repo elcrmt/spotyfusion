@@ -1,7 +1,5 @@
 'use client';
 
-// Boutons de réponse - Design maquette Figma avec feedback visuel
-
 interface AnswerButtonsProps {
     options: string[];
     correctIndex: number;
@@ -20,18 +18,14 @@ export function AnswerButtons({
     return (
         <div className="grid grid-cols-1 gap-3 w-full max-w-md">
             {options.map((option, index) => {
-                // Déterminer le style du bouton selon l'état
                 let buttonStyle = "bg-[#282828] hover:bg-[#333] border-[#404040]";
                 
                 if (isAnswered) {
                     if (index === correctIndex) {
-                        // Bonne réponse : vert
                         buttonStyle = "bg-green-600/20 border-green-600 text-green-500";
                     } else if (index === selectedIndex) {
-                        // Mauvaise réponse sélectionnée : rouge
                         buttonStyle = "bg-red-600/20 border-red-600 text-red-500";
                     } else {
-                        // Autres réponses : grisées
                         buttonStyle = "bg-[#282828] border-[#404040] opacity-50";
                     }
                 }

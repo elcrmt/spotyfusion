@@ -1,7 +1,5 @@
 'use client';
 
-// Composant TopArtists - Carousel horizontal avec images rondes - Maquette Figma
-
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -49,7 +47,6 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
     }
   };
 
-  // État de chargement
   if (isLoading) {
     return (
       <div>
@@ -66,7 +63,6 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
     );
   }
 
-  // État d'erreur
   if (error) {
     return (
       <div>
@@ -78,7 +74,6 @@ export function TopArtists({ timeRange = 'medium_term' }: TopArtistsProps) {
     );
   }
 
-  // Pas de données
   if (artists.length === 0) {
     return (
       <div>
