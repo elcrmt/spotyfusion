@@ -15,6 +15,7 @@ export default function BlindTestPage() {
     score,
     lastAnswerCorrect,
     error,
+    playedTracks,
     loadPlaylists,
     selectPlaylist,
     submitAnswer,
@@ -85,6 +86,8 @@ export default function BlindTestPage() {
         <EndScreen
           score={score}
           totalQuestions={totalQuestions}
+          playlistName={selectedPlaylist?.name || 'Playlist'}
+          tracks={playedTracks || []}
           onRestart={restart}
         />
       )}

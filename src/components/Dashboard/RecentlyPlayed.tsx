@@ -94,50 +94,85 @@ export function RecentlyPlayed() {
     <div>
       <h2 className="text-xl font-bold text-white mb-4">5 Derniers Titres Écoutés</h2>
 
-      <div className="space-y-2">
-        {tracks.map((track, index) => (
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-3">
+        {/* Premier titre - Grande carte à gauche */}
+        {tracks[0] && (
           <a
-            key={`${track.id}-${index}`}
-            href={track.externalUrl}
+            href={tracks[0].externalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-[#181818] rounded-lg p-3 hover:bg-[#282828] transition-colors group"
+            className="bg-[#181818] rounded-lg p-4 hover:bg-[#282828] transition-colors group"
           >
-            {/* Grande image pour le premier, petite pour les autres */}
-            <div className={`relative flex-shrink-0 rounded-lg overflow-hidden bg-[#282828] ${index === 0 ? 'w-[180px] h-[100px]' : 'w-[60px] h-[60px]'
-              }`}>
-              {track.albumImageUrl ? (
+            <div className="relative w-full h-[180px] rounded-lg overflow-hidden bg-[#282828] mb-3">
+              {tracks[0].albumImageUrl ? (
                 <Image
-                  src={track.albumImageUrl}
-                  alt={track.albumName}
+                  src={tracks[0].albumImageUrl}
+                  alt={tracks[0].albumName}
                   fill
                   className="object-cover"
-                  sizes={index === 0 ? "180px" : "60px"}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-2xl">
+                <div className="flex h-full w-full items-center justify-center text-4xl">
                   💿
                 </div>
               )}
             </div>
-
-            {/* Infos */}
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-medium truncate group-hover:text-green-400 transition-colors">
-                {track.name}
-              </p>
-              <p className="text-[#b3b3b3] text-sm truncate">
-                {track.artists.map((a) => a.name).join(', ')}
-              </p>
-            </div>
-
-            {/* Horodatage */}
-            <div className="flex items-center gap-2 text-[#b3b3b3] text-sm flex-shrink-0">
+            <p className="text-white font-medium truncate group-hover:text-green-400 transition-colors">
+              {tracks[0].name}
+            </p>
+            <p className="text-[#b3b3b3] text-sm truncate mb-2">
+              {tracks[0].artists.map((a) => a.name).join(', ')}
+            </p>
+            <div className="flex items-center gap-2 text-[#b3b3b3] text-sm">
               <Clock className="w-4 h-4" />
-              <span>{formatPlayedAt(track.playedAt)}</span>
+              <span>{formatPlayedAt(tracks[0].playedAt)}</span>
             </div>
           </a>
-        ))}
+        )}
+
+        {/* Les 4 autres titres - Empilés à droite */}
+        <div className="space-y-2">
+          {tracks.slice(1).map((track, index) => (
+            <a
+              key={`${track.id}-${index + 1}`}
+              href={track.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-[#181818] rounded-lg p-3 hover:bg-[#282828] transition-colors group"
+            >
+              <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-[#282828]">
+                {track.albumImageUrl ? (
+                  <Image
+                    src={track.albumImageUrl}
+                    alt={track.albumName}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xl">
+                    💿
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-medium text-sm truncate group-hover:text-green-400 transition-colors">
+                  {track.name}
+                </p>
+                <p className="text-[#b3b3b3] text-xs truncate">
+                  {track.artists.map((a) => a.name).join(', ')}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[#b3b3b3] text-xs flex-shrink-0">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{formatPlayedAt(track.playedAt)}</span>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );

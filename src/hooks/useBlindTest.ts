@@ -282,10 +282,17 @@ export function useBlindTest() {
     // Question actuelle
     const currentQuestion = state.questions[state.currentQuestionIndex] || null;
 
+    const playedTracks = state.questions.slice(0, state.currentQuestionIndex).map(q => ({
+        name: q.track.name,
+        artist: q.track.artists.join(', '),
+        imageUrl: q.track.albumImageUrl
+    }));
+
     return {
         ...state,
         currentQuestion,
         totalQuestions: state.questions.length || TOTAL_QUESTIONS,
+        playedTracks,
         loadPlaylists,
         selectPlaylist,
         submitAnswer,

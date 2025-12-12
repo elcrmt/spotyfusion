@@ -1,77 +1,72 @@
 'use client';
 
-import { Trophy, Star, ThumbsUp, Headphones, Dumbbell, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
+import Image from 'next/image';
+
+interface Track {
+    name: string;
+    artist: string;
+    imageUrl?: string | null;
+}
 
 interface EndScreenProps {
     score: number;
     totalQuestions: number;
+    playlistName: string;
+    tracks: Track[];
     onRestart: () => void;
 }
 
-export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) {
-    const maxScore = totalQuestions * 10;
-    const percentage = Math.round((score / maxScore) * 100);
-    const correctAnswers = Math.floor(score / 10);
-    const wrongAnswers = totalQuestions - correctAnswers;
-
-    const getMessage = () => {
-        if (percentage === 100) return { Icon: Trophy, text: 'Parfait ! Tu es un vrai mélomane !', color: 'text-yellow-500' };
-        if (percentage >= 80) return { Icon: Star, text: 'Excellent ! Tu connais bien ta musique !', color: 'text-green-500' };
-        if (percentage >= 60) return { Icon: ThumbsUp, text: 'Pas mal ! Continue à écouter !', color: 'text-blue-500' };
-        if (percentage >= 40) return { Icon: Headphones, text: 'Tu peux faire mieux, réécoute tes playlists !', color: 'text-orange-500' };
-        return { Icon: Dumbbell, text: 'Ne lâche rien, la musique s\'apprend !', color: 'text-purple-500' };
-    };
-
-    const { Icon, text, color } = getMessage();
-
+export function EndScreen({ score, totalQuestions, playlistName, tracks, onRestart }: EndScreenProps) {
     return (
-        <div className="flex flex-col items-center justify-center text-center py-8 sm:py-12 px-4">
-            {/* Icône animée */}
-            <div className={`mb-4 sm:mb-6 animate-bounce ${color}`}>
-                <Icon className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" />
-            </div>
-
-            {/* Score */}
-            <div className="mb-3 sm:mb-4">
-                <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">{score}</span>
-                <span className="text-xl sm:text-2xl text-zinc-400">/{maxScore}</span>
-            </div>
-
-            {/* Pourcentage */}
-            <div className="flex items-center gap-2 mb-4 sm:mb-6 w-full max-w-xs">
-                <div className="flex-1 h-2 sm:h-3 bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-1000"
-                        style={{ width: `${percentage}%` }}
-                    />
+        <div className="w-full max-w-2xl mx-auto">
+            <div className="bg-green-500 rounded-xl p-6 mb-8 flex items-center justify-between">
+                <div className="bg-white text-black px-6 py-3 rounded-lg font-bold text-2xl">
+                    {score}pts
                 </div>
-                <span className="text-green-400 font-semibold text-sm sm:text-base">{percentage}%</span>
+                <h1 className="text-2xl font-bold text-black">
+                    {playlistName}
+                </h1>
             </div>
 
-            {/* Message */}
-            <p className="text-base sm:text-lg md:text-xl text-zinc-300 mb-6 sm:mb-8 max-w-md px-4">{text}</p>
+            <div className="mb-8">
+                <h2 className="text-lg font-bold text-white mb-4">Morceaux joués</h2>
+                <div className="space-y-2">
+                    {tracks.map((track, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center gap-4 bg-[#181818] p-3 rounded-lg hover:bg-[#282828] transition-colors"
+                        >
+                            {track.imageUrl ? (
+                                <Image
+                                    src={track.imageUrl}
+                                    alt={track.name}
+                                    width={48}
+                                    height={48}
+                                    className="rounded"
+                                />
+                            ) : (
+                                <div className="w-12 h-12 bg-[#282828] rounded flex items-center justify-center text-xl">
+                                    🎵
+                                </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                                <p className="text-white font-medium truncate">{track.name}</p>
+                                <p className="text-[#b3b3b3] text-sm truncate">{track.artist}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
-            {/* Boutons */}
-            <div className="flex gap-3 sm:gap-4">
+            <div className="flex justify-center">
                 <button
                     onClick={onRestart}
-                    className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-green-500 hover:bg-green-400 text-white font-semibold text-sm sm:text-base transition-all hover:scale-105 flex items-center gap-2"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-colors"
                 >
-                    <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <RotateCcw className="w-5 h-5" />
                     Rejouer
                 </button>
-            </div>
-
-            {/* Stats supplémentaires */}
-            <div className="mt-8 sm:mt-12 grid grid-cols-2 gap-6 sm:gap-8 text-center w-full max-w-xs">
-                <div>
-                    <p className="text-2xl sm:text-3xl font-bold text-green-400">{correctAnswers}</p>
-                    <p className="text-zinc-500 text-xs sm:text-sm">Bonnes réponses</p>
-                </div>
-                <div>
-                    <p className="text-2xl sm:text-3xl font-bold text-red-400">{wrongAnswers}</p>
-                    <p className="text-zinc-500 text-xs sm:text-sm">Mauvaises réponses</p>
-                </div>
             </div>
         </div>
     );
