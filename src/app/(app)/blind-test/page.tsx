@@ -77,6 +77,7 @@ export default function BlindTestPage() {
           score={score}
           onAnswer={submitAnswer}
           onNext={nextQuestion}
+          onQuit={restart}
           isAnswered={phase === 'answered'}
           lastAnswerCorrect={lastAnswerCorrect}
         />

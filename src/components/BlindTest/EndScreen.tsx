@@ -11,7 +11,11 @@ interface EndScreenProps {
 }
 
 export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) {
-    const percentage = Math.round((score / totalQuestions) * 100);
+    // Le score est maintenant sur 100 points (10 points par question)
+    const maxScore = totalQuestions * 10;
+    const percentage = Math.round((score / maxScore) * 100);
+    const correctAnswers = Math.floor(score / 10);
+    const wrongAnswers = totalQuestions - correctAnswers;
 
     const getMessage = () => {
         if (percentage === 100) return { Icon: Trophy, text: 'Parfait ! Tu es un vrai mélomane !', color: 'text-yellow-500' };
@@ -33,7 +37,7 @@ export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) 
             {/* Score */}
             <div className="mb-3 sm:mb-4">
                 <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">{score}</span>
-                <span className="text-xl sm:text-2xl text-zinc-400">/{totalQuestions}</span>
+                <span className="text-xl sm:text-2xl text-zinc-400">/{maxScore}</span>
             </div>
 
             {/* Pourcentage */}
@@ -64,11 +68,11 @@ export function EndScreen({ score, totalQuestions, onRestart }: EndScreenProps) 
             {/* Stats supplémentaires */}
             <div className="mt-8 sm:mt-12 grid grid-cols-2 gap-6 sm:gap-8 text-center w-full max-w-xs">
                 <div>
-                    <p className="text-2xl sm:text-3xl font-bold text-green-400">{score}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-green-400">{correctAnswers}</p>
                     <p className="text-zinc-500 text-xs sm:text-sm">Bonnes réponses</p>
                 </div>
                 <div>
-                    <p className="text-2xl sm:text-3xl font-bold text-red-400">{totalQuestions - score}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-red-400">{wrongAnswers}</p>
                     <p className="text-zinc-500 text-xs sm:text-sm">Mauvaises réponses</p>
                 </div>
             </div>

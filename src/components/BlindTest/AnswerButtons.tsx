@@ -1,6 +1,6 @@
 'use client';
 
-// Boutons de réponse avec feedback visuel (C3, C4)
+// Boutons de réponse - Design maquette Figma avec feedback visuel
 
 interface AnswerButtonsProps {
     options: string[];
@@ -17,55 +17,36 @@ export function AnswerButtons({
     isAnswered,
     selectedIndex,
 }: AnswerButtonsProps) {
-    const getButtonStyle = (index: number) => {
-        if (!isAnswered) {
-            return 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 hover:border-zinc-600 text-white';
-        }
-
-        if (index === correctIndex) {
-            return 'bg-green-500/20 border-green-500 text-green-400';
-        }
-
-        if (index === selectedIndex && index !== correctIndex) {
-            return 'bg-red-500/20 border-red-500 text-red-400';
-        }
-
-        return 'bg-zinc-800/50 border-zinc-700 text-zinc-500';
-    };
-
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full max-w-2xl">
-            {options.map((option, index) => (
-                <button
-                    key={index}
-                    onClick={() => !isAnswered && onAnswer(index)}
-                    disabled={isAnswered}
-                    className={`
-            relative p-3 sm:p-4 rounded-xl border-2 text-left transition-all
-            ${getButtonStyle(index)}
-            ${!isAnswered && 'cursor-pointer active:scale-98'}
-            ${isAnswered && 'cursor-default'}
-          `}
-                >
-                    {/* Numéro de l'option */}
-                    <span className="absolute top-2 left-2 sm:left-3 text-xs opacity-50">
-                        {String.fromCharCode(65 + index)}
-                    </span>
+        <div className="grid grid-cols-1 gap-3 w-full max-w-md">
+            {options.map((option, index) => {
+                // Déterminer le style du bouton selon l'état
+                let buttonStyle = "bg-[#282828] hover:bg-[#333] border-[#404040]";
+                
+                if (isAnswered) {
+                    if (index === correctIndex) {
+                        // Bonne réponse : vert
+                        buttonStyle = "bg-green-600/20 border-green-600 text-green-500";
+                    } else if (index === selectedIndex) {
+                        // Mauvaise réponse sélectionnée : rouge
+                        buttonStyle = "bg-red-600/20 border-red-600 text-red-500";
+                    } else {
+                        // Autres réponses : grisées
+                        buttonStyle = "bg-[#282828] border-[#404040] opacity-50";
+                    }
+                }
 
-                    {/* Texte de la réponse */}
-                    <span className="block mt-2 sm:mt-3 font-medium text-sm sm:text-base truncate pr-6">
+                return (
+                    <button
+                        key={index}
+                        onClick={() => !isAnswered && onAnswer(index)}
+                        disabled={isAnswered}
+                        className={`relative p-4 rounded-xl border text-center font-medium text-base transition-all disabled:cursor-not-allowed ${buttonStyle}`}
+                    >
                         {option}
-                    </span>
-
-                    {/* Icône de résultat */}
-                    {isAnswered && index === correctIndex && (
-                        <span className="absolute top-2 right-2 sm:right-3 text-green-400">✓</span>
-                    )}
-                    {isAnswered && index === selectedIndex && index !== correctIndex && (
-                        <span className="absolute top-2 right-2 sm:right-3 text-red-400">✗</span>
-                    )}
-                </button>
-            ))}
+                    </button>
+                );
+            })}
         </div>
     );
 }

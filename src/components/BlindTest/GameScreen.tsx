@@ -1,13 +1,12 @@
 'use client';
 
-// Écran de jeu principal (C2-C4)
-// Version SDK Spotify (dumb component)
+// Écran de jeu principal - Design maquette Figma
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { AnswerButtons } from './AnswerButtons';
 import { BlindTestQuestion } from '@/hooks/useBlindTest';
-import { Music } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface GameScreenProps {
     question: BlindTestQuestion;
@@ -16,6 +15,7 @@ interface GameScreenProps {
     score: number;
     onAnswer: (index: number) => void;
     onNext: () => void;
+    onQuit?: () => void;
     isAnswered: boolean;
     lastAnswerCorrect: boolean | null;
 }
@@ -27,14 +27,23 @@ export function GameScreen({
     score,
     onAnswer,
     onNext,
+    onQuit,
     isAnswered,
     lastAnswerCorrect,
 }: GameScreenProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | undefined>(undefined);
+    const [timeLeft, setTimeLeft] = useState(15); // Timer de 15 secondes
+    const [timerProgress, setTimerProgress] = useState(100); // Pourcentage du timer
 
     const handleAnswer = (index: number) => {
         setSelectedIndex(index);
         onAnswer(index);
+    };
+
+    const handleQuit = () => {
+        if (onQuit) {
+            onQuit();
+        }
     };
 
     // Reset selectedIndex when question changes
@@ -42,48 +51,112 @@ export function GameScreen({
         setSelectedIndex(undefined);
     }
 
+    // Timer de 15 secondes - Reset au changement de question
+    useEffect(() => {
+        setTimeLeft(15);
+        setTimerProgress(100);
+    }, [questionNumber]);
+
+    // Gestion du timer (décompte uniquement si non répondu)
+    useEffect(() => {
+        if (isAnswered) return;
+
+        const startTime = Date.now();
+        const duration = 15000; // 15 secondes en ms
+
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, duration - elapsed);
+            const seconds = Math.ceil(remaining / 1000);
+            const progress = (remaining / duration) * 100;
+
+            setTimeLeft(seconds);
+            setTimerProgress(progress);
+
+            if (remaining <= 0) {
+                clearInterval(interval);
+                // Timeout : on passe automatiquement à la question suivante sans points
+                setTimeout(() => {
+                    onNext();
+                }, 500);
+            }
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, [questionNumber, isAnswered, onNext]);
+
+    // Calcul pour le cercle du timer
+    const circumference = 2 * Math.PI * 60; // rayon = 60
+    const strokeDashoffset = circumference - (timerProgress / 100) * circumference;
+
     return (
-        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-3xl mx-auto px-4">
-            {/* Header avec score et progression */}
-            <div className="w-full flex items-center justify-between">
-                <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-zinc-400 text-xs sm:text-sm">Question</span>
-                    <span className="text-white font-bold text-base sm:text-lg">
-                        {questionNumber}/{totalQuestions}
-                    </span>
-                </div>
-
-                <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-zinc-400 text-xs sm:text-sm">Score</span>
-                    <span className="text-green-400 font-bold text-base sm:text-lg">{score}</span>
+        <div className="relative flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
+            {/* Header avec bouton fermer à gauche, titre au centre et compteur à droite */}
+            <div className="w-full flex items-center justify-between mb-4 relative">
+                {/* Bouton fermer à gauche */}
+                <button 
+                    onClick={handleQuit}
+                    className="w-10 h-10 rounded-full bg-[#1a1a1a] hover:bg-[#282828] flex items-center justify-center transition-colors z-10"
+                >
+                    <X className="w-5 h-5 text-white" />
+                </button>
+                
+                {/* Titre au centre (absolu pour être vraiment centré) */}
+                <h1 className="text-xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                    Mellow Morning
+                </h1>
+                
+                {/* Compteur à droite */}
+                <div className="text-white text-sm font-medium">
+                    {questionNumber}/{totalQuestions}
                 </div>
             </div>
 
-            {/* Barre de progression */}
-            <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                    className="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
-                    style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
-                />
-            </div>
-
-            {/* Album cover */}
-            <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-xl overflow-hidden bg-zinc-800 shadow-2xl">
-                {isAnswered && question.track.albumImageUrl ? (
-                    <img
-                        src={question.track.albumImageUrl}
-                        alt="Album cover"
-                        className="w-full h-full object-cover animate-fade-in"
+            {/* Cercle de timer avec temps restant */}
+            <div className="relative w-48 h-48 flex items-center justify-center">
+                {/* Cercle SVG */}
+                <svg className="absolute w-full h-full -rotate-90">
+                    {/* Cercle de fond */}
+                    <circle
+                        cx="96"
+                        cy="96"
+                        r="60"
+                        stroke="#282828"
+                        strokeWidth="8"
+                        fill="none"
                     />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-800">
-                        <Music className="w-16 h-16 sm:w-20 sm:h-20 text-zinc-600" />
-                    </div>
-                )}
+                    {/* Cercle de timer vert */}
+                    <circle
+                        cx="96"
+                        cy="96"
+                        r="60"
+                        stroke="#1db954"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        className="transition-all duration-100"
+                    />
+                </svg>
+                {/* Temps restant ou score au centre */}
+                <div className="text-6xl font-bold text-white">
+                    {!isAnswered ? timeLeft : score}
+                </div>
             </div>
 
-            {/* Audio player (Visual only) */}
-            <AudioPlayer isPlaying={!isAnswered} />
+            {/* Indicateur de lecture audio */}
+            {!isAnswered && (
+                <div className="flex items-center gap-2 text-green-500 animate-pulse">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                    <span className="text-sm font-medium">En écoute...</span>
+                </div>
+            )}
+
+            {/* Badge avec points gagnés ou nom de la chanson */}
+            <div className="bg-white text-black px-6 py-2 rounded-lg font-semibold text-lg">
+                {!isAnswered ? '10 pts' : question.track.name}
+            </div>
 
             {/* Boutons de réponse */}
             <AnswerButtons
@@ -94,29 +167,15 @@ export function GameScreen({
                 selectedIndex={selectedIndex}
             />
 
-            {/* Feedback et bouton suivant */}
+            {/* Bouton suivant (visible uniquement après avoir répondu) */}
             {isAnswered && (
-                <div className="flex flex-col items-center gap-3 sm:gap-4 animate-fade-in w-full">
-                    <div className={`text-base sm:text-lg font-semibold ${lastAnswerCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                        {lastAnswerCorrect ? '✓ Correct !' : '✗ Mauvaise réponse'}
-                    </div>
-
-                    <div className="text-center">
-                        <p className="text-white font-medium text-sm sm:text-base">{question.track.name}</p>
-                        <p className="text-zinc-400 text-xs sm:text-sm">
-                            {question.track.artists.join(', ')}
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={onNext}
-                        className="mt-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-green-500 hover:bg-green-400 text-white text-sm sm:text-base font-semibold transition-all hover:scale-105"
-                    >
-                        {questionNumber === totalQuestions ? 'Voir le résultat' : 'Question suivante →'}
-                    </button>
-                </div>
+                <button
+                    onClick={onNext}
+                    className="mt-4 px-8 py-3 bg-white text-black rounded-full font-semibold text-base hover:scale-105 transition-transform"
+                >
+                    Question suivante
+                </button>
             )}
-
         </div>
     );
 }
