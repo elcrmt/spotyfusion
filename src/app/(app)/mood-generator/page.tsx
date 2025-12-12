@@ -241,9 +241,9 @@ export default function MoodGeneratorPage() {
             </div>
           )}
 
-          {/* Info */}
-          <div className="flex items-start gap-2 text-[#6a6a6a] text-xs">
-            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          {/* Info - Style vert */}
+          <div className="flex items-start gap-2 bg-green-900/20 rounded-lg p-3 text-white text-xs">
+            <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-green-400" />
             <p>Ajoutez jusqu&apos;à 5 semences (artistes, pistes ou genres) pour personnaliser vos recommandations</p>
           </div>
         </div>

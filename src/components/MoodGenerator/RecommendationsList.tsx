@@ -46,12 +46,28 @@ export function RecommendationsList({
 
     if (tracks.length === 0) {
         return (
-            <div className="bg-[#181818] rounded-xl p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Recommandations</h2>
-                <div className="text-center py-12">
-                    <p className="text-[#b3b3b3]">Aucune recommandation générée</p>
-                    <p className="text-[#6a6a6a] text-sm mt-1">
-                        Ajoutez des semences et cliquez sur Générer
+            <div className="bg-[#181818] rounded-xl p-6 relative overflow-hidden">
+                {/* Titre centré */}
+                <h2 className="text-lg font-bold text-white text-center mb-8">Recommandations</h2>
+
+                {/* Contenu centré */}
+                <div className="flex flex-col items-center justify-center py-12">
+                    {/* Icône note de musique - Figma PNG */}
+                    <Image
+                        src="/icons/music-note.png"
+                        alt="Note de musique"
+                        width={64}
+                        height={64}
+                        className="mb-6 opacity-50"
+                    />
+
+                    {/* Texte principal */}
+                    <p className="text-[#b3b3b3] text-lg mb-2">Aucune recommandation pour le moment</p>
+
+                    {/* Sous-texte */}
+                    <p className="text-[#6a6a6a] text-sm text-center">
+                        Configurez vos préférences et ajoutez des semences,<br />
+                        puis cliquez sur &quot;Générer les recommandations&quot;
                     </p>
                 </div>
             </div>
@@ -141,10 +157,10 @@ export function RecommendationsList({
                         {track.energy !== undefined && (
                             <div className="w-12 flex items-center justify-end gap-1">
                                 <Zap className={`w-3 h-3 ${track.energy >= 0.7 ? 'text-red-400' :
-                                        track.energy >= 0.4 ? 'text-orange-400' : 'text-blue-400'
+                                    track.energy >= 0.4 ? 'text-orange-400' : 'text-blue-400'
                                     }`} />
                                 <span className={`text-xs ${track.energy >= 0.7 ? 'text-red-400' :
-                                        track.energy >= 0.4 ? 'text-orange-400' : 'text-blue-400'
+                                    track.energy >= 0.4 ? 'text-orange-400' : 'text-blue-400'
                                     }`}>
                                     {Math.round(track.energy * 100)}
                                 </span>
