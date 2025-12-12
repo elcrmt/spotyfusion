@@ -7,6 +7,7 @@ import { Sparkles, Info, X } from 'lucide-react';
 import {
   RecommendationsList,
 } from '@/components/MoodGenerator';
+import { GreenSlider } from '@/components/Common/GreenSlider';
 import {
   fetchRecommendations,
   type Seed,
@@ -146,67 +147,28 @@ export default function MoodGeneratorPage() {
           <h2 className="text-lg font-bold text-white mb-6">Caractéristiques Audio</h2>
 
           {/* Danceability Slider */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white font-medium">Danceability</span>
-              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
-                {danceability.toFixed(2)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={danceability * 100}
-              onChange={(e) => setDanceability(Number(e.target.value) / 100)}
-              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
-            />
-            <p className="text-[#6a6a6a] text-xs mt-1">
-              À quel point la musique est adaptée à la danse
-            </p>
-          </div>
+          <GreenSlider
+            value={danceability}
+            onChange={setDanceability}
+            label="Danceability"
+            description="À quel point la musique est adaptée à la danse"
+          />
 
           {/* Energy Slider */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white font-medium">Energy</span>
-              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
-                {energy.toFixed(2)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={energy * 100}
-              onChange={(e) => setEnergy(Number(e.target.value) / 100)}
-              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
-            />
-            <p className="text-[#6a6a6a] text-xs mt-1">
-              Intensité et activité de la musique
-            </p>
-          </div>
+          <GreenSlider
+            value={energy}
+            onChange={setEnergy}
+            label="Energy"
+            description="Intensité et activité de la musique"
+          />
 
           {/* Valence Slider */}
-          <div className="mb-2">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white font-medium">Valence (Positivité)</span>
-              <span className="text-[#b3b3b3] text-sm bg-[#282828] px-2 py-0.5 rounded">
-                {valence.toFixed(2)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={valence * 100}
-              onChange={(e) => setValence(Number(e.target.value) / 100)}
-              className="w-full h-2 bg-[#404040] rounded-full appearance-none cursor-pointer slider-green"
-            />
-            <p className="text-[#6a6a6a] text-xs mt-1">
-              Humeur positive ou négative de la musique
-            </p>
-          </div>
+          <GreenSlider
+            value={valence}
+            onChange={setValence}
+            label="Valence (Positivité)"
+            description="Humeur positive ou négative de la musique"
+          />
         </div>
 
         {/* Colonne Droite - Semences */}
@@ -260,8 +222,8 @@ export default function MoodGeneratorPage() {
                   onClick={() => addGenreSeed(genre)}
                   disabled={seeds.length >= 5 || seeds.find(s => s.id === genre.toLowerCase()) !== undefined}
                   className={`px-3 py-1 rounded-full text-sm border transition-colors ${seeds.find(s => s.id === genre.toLowerCase())
-                      ? 'bg-green-500 text-black border-green-500'
-                      : 'border-[#333] text-white hover:border-white disabled:opacity-50'
+                    ? 'bg-green-500 text-black border-green-500'
+                    : 'border-[#333] text-white hover:border-white disabled:opacity-50'
                     }`}
                 >
                   {genre}
